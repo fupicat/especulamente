@@ -1,0 +1,13 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCurrentUserProfile } from "@/lib/supabaseServer";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+---
+
+<Layout title="home" profile={sessionProfile}>
+  <h1>Créditos</h1>
+  <p>Tudo: Hawnt</p>
+  <p>Tudo de novo: Hawnt</p>
+  <p>Splats: Hawnt</p>
+</Layout>

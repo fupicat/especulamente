@@ -1,0 +1,13 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCurrentUserProfile } from "@/lib/supabaseServer";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+
+if (!sessionProfile) return Astro.redirect("/403");
+---
+
+<Layout title="criar" profile={sessionProfile}>
+  <h1>O que você quer criar?</h1>
+  <a href="/admin/criar/media">Mídia</a>
+</Layout>

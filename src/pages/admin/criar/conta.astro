@@ -1,0 +1,89 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCurrentUserProfile } from "@/lib/supabaseServer";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+
+if (!sessionProfile) return Astro.redirect("/403");
+---
+
+<Layout title="criar conta" profile={sessionProfile}>
+  <form id="definir_senha">
+    <label for="username">Username</label>
+    <input type="text" name="username" id="username" />
+    <label for="senha">Senha</label>
+    <input type="password" name="senha" id="senha" />
+    <input type="submit" value="submit" />
+  </form>
+</Layout>
+
+<script>
+  import { supabase } from "@/lib/supabaseClient";
+
+  const accessToken = JSON.parse(
+    localStorage.getItem("sb-rqajdbmoinhxkzqtzidd-auth-token") as string
+  ).access_token;
+
+  (document.querySelector("#definir_senha") as HTMLElement).addEventListener(
+    "submit",
+    (e: Event) => {
+      e.preventDefault();
+      if (!accessToken) {
+        alert("OQAF você NÃO pode criar uma conta.");
+        return;
+      }
+
+      async function asyncCreateAccount() {
+        const username = (
+          document.querySelector("#username") as HTMLInputElement
+        ).value;
+
+        // Checar se o nome de usuário já existe
+        const usernameExists = await supabase
+          .from("profiles")
+          .select("username")
+          .eq("username", username);
+
+        if (usernameExists.error) {
+          alert(usernameExists.error);
+          return;
+        }
+
+        if (usernameExists.data.length > 0) {
+          alert("Erro!! Nome de usuário já existe!! Cadê a CRIATIVIDADE??");
+          return;
+        }
+
+        // Atualizar senha
+        const updatePassword = await supabase.auth.updateUser({
+          password: (document.querySelector("#senha") as HTMLInputElement)
+            .value,
+        });
+
+        if (updatePassword.error) {
+          alert(updatePassword.error);
+          return;
+        }
+
+        // Atualizar nome de usuário
+        const updateUsername = await supabase
+          .from("profiles")
+          .update({
+            username,
+            nickname: username,
+          })
+          .eq("id", (await supabase.auth.getUser()).data.user?.id);
+
+        if (updateUsername.error) {
+          alert(updateUsername.error);
+          return;
+        }
+
+        alert("Ok agora a conta deve ter sido criada, eu espero.");
+        window.location.href = "/";
+      }
+
+      asyncCreateAccount();
+    }
+  );
+</script>

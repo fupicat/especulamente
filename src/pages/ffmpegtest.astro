@@ -1,0 +1,173 @@
+---
+Astro.response.headers.set("Cross-Origin-Embedder-Policy", "require-corp");
+Astro.response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
+---
+
+<html>
+  <head>
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Click start to transcode images to mp4 (x264) and play!</h3>
+    <video id="output-video" controls width="640" height="360"></video><br />
+    <br />
+    <p>Image</p>
+    <input
+      type="file"
+      name="image"
+      id="image"
+      accept="image/*"
+      style="height: 40px;"
+    />
+    <canvas
+      id="poster"
+      width="1920"
+      height="1080"
+      style="width: 100%; display: none;"></canvas>
+    <p>Audio</p>
+    <input
+      type="file"
+      name="audio"
+      id="audio"
+      accept="audio/*"
+      style="height: 40px;"
+    />
+    <br />
+    <button id="start-btn">Start</button>
+    <p id="message"></p>
+    <script>
+      import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+
+      const ffmpeg = createFFmpeg({ log: true });
+
+      const image2video = async () => {
+        const image =
+          document.querySelector<HTMLInputElement>("#image")!.files![0];
+        const audio =
+          document.querySelector<HTMLInputElement>("audio")!.files![0];
+
+        const canvas = document.getElementById("poster") as HTMLCanvasElement;
+        const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+        const imageBitmap = await createImageBitmap(image);
+
+        // Desenhar fundo preto
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Desenhar imagem borrada
+        let newWidth = canvas.width;
+        let newHeight = (imageBitmap.height * newWidth) / imageBitmap.width;
+
+        ctx.filter = "blur(40px) opacity(50%)";
+        ctx.drawImage(
+          imageBitmap,
+          0,
+          canvas.height / 2 - newHeight / 2,
+          newWidth,
+          newHeight
+        );
+
+        // Desenhar imagem sem filtro
+        newHeight = canvas.height;
+        newWidth = (imageBitmap.width * newHeight) / imageBitmap.height;
+
+        ctx.filter = "blur(0px) opacity(100%)";
+        ctx.drawImage(
+          imageBitmap,
+          canvas.width / 2 - newWidth / 2,
+          0,
+          newWidth,
+          newHeight
+        );
+
+        const getDuration = (file: File) => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onloadend = (e) => {
+              const ctx = new AudioContext();
+              const audioArrayBuffer = e.target?.result as ArrayBuffer;
+              ctx.decodeAudioData(
+                audioArrayBuffer,
+                (data) => {
+                  const duration = data.duration;
+                  resolve(duration);
+                },
+                (error) => {
+                  reject(error);
+                }
+              );
+            };
+            reader.onerror = reject;
+          });
+        };
+
+        const message = document.getElementById(
+          "message"
+        ) as HTMLParagraphElement;
+        message.innerHTML = "Loading ffmpeg-core.js";
+
+        if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
+        message.innerHTML = "Loading data";
+        ffmpeg.FS("writeFile", audio.name, await fetchFile(audio));
+        ffmpeg.FS(
+          "writeFile",
+          "poster.png",
+          await fetchFile(
+            await new Promise((resolve) =>
+              canvas.toBlob(resolve as BlobCallback)
+            )
+          )
+        );
+        message.innerHTML = "Start transcoding";
+        await ffmpeg.run(
+          "-framerate",
+          "24",
+          "-loop",
+          "1",
+          "-i",
+          "poster.png",
+          "-i",
+          audio.name,
+          "-c:a",
+          "copy",
+          "-shortest",
+          "-c:v",
+          "libx264",
+          "-t",
+          String(await getDuration(audio)),
+          "-pix_fmt",
+          "yuv420p",
+          "out.mp4"
+        );
+        const data = ffmpeg.FS("readFile", "out.mp4");
+        ffmpeg.FS("unlink", audio.name);
+        ffmpeg.FS("unlink", "poster.png");
+
+        const video = document.getElementById(
+          "output-video"
+        ) as HTMLVideoElement;
+        video.src = URL.createObjectURL(
+          new Blob([data.buffer], { type: "video/mp4" })
+        );
+      };
+
+      const elm = document.getElementById("start-btn") as HTMLButtonElement;
+      elm.addEventListener("click", image2video);
+    </script>
+  </body>
+</html>

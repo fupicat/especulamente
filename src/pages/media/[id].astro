@@ -1,0 +1,60 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCurrentUserProfile, getMediaByID } from "@/lib/supabaseServer";
+import { marked } from "marked";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+
+const media = await getMediaByID(Astro.params.id);
+
+if (!media) return Astro.redirect("/404");
+---
+
+<Layout title="media" profile={sessionProfile}>
+  {
+    media && (
+      <div class="media">
+        {media.author.id === sessionProfile.id && (
+          <a href={`/admin/editar/media/${media.id}`}>Editar mídia</a>
+        )}
+        <h1>{media.title}</h1>
+        {media.video_url && media.video_url.includes("youtu") && (
+          <div class="youtube">
+            <iframe
+              width="560"
+              height="315"
+              src={`https://www.youtube-nocookie.com/embed/${
+                new URLSearchParams(new URL(media.video_url).search).get("v") ||
+                new URL(media.video_url).pathname.substring(1)
+              }`}
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            />
+          </div>
+        )}
+        {media.video_url && !media.video_url.includes("youtu") && (
+          <div class="video">
+            <video src={media.video_url} controls />
+          </div>
+        )}
+        {media.image_url && !media.video_url && (
+          <div class="image">
+            <img src={media.image_url} alt={media.title} />
+          </div>
+        )}
+        <div class="description" set:html={marked.parse(media.description)} />
+        <p class="date">{new Date(media.created_at).toLocaleString("pt")}</p>
+        <p>
+          <b>Tags</b>
+        </p>
+        <ul>
+          {media.tags.map((tag: string) => (
+            <li>{tag}</li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+</Layout>

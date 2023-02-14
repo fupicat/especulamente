@@ -1,0 +1,64 @@
+---
+import GlobalStyles from "@/components/GlobalStyles.astro";
+import Header from "@/components/Header.astro";
+
+export interface Props {
+  title: string;
+  profile: any | null;
+  id?: string;
+}
+
+const { title, profile, id } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css"
+    />
+  </head>
+  <body>
+    <Header profile={profile} />
+    <main id={id} class="container">
+      <slot />
+    </main>
+    <footer>
+      <a href="/creditos">Créditos</a>
+    </footer>
+  </body>
+</html>
+
+<script>
+  import { supabase } from "../lib/supabaseClient";
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT" || event === "USER_DELETED") {
+      const expires = new Date(0).toUTCString();
+      document.cookie = `my-access-token=; path=/; expires=${expires}; SameSite=Lax; secure`;
+      document.cookie = `my-refresh-token=; path=/; expires=${expires}; SameSite=Lax; secure`;
+      window.location.reload();
+    } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+      const maxAge = 437 * 365 * 24 * 60 * 60; // 437 years (end of universe)
+      document.cookie = `my-access-token=${session?.access_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`;
+      document.cookie = `my-refresh-token=${session?.refresh_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`;
+    }
+  });
+</script>
+
+<GlobalStyles />
+
+<noscript>
+  <style lang="scss" is:global>
+    .js-only {
+      display: none !important;
+    }
+  </style>
+</noscript>

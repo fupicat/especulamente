@@ -1,0 +1,10 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCurrentUserProfile } from "@/lib/supabaseServer";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+---
+
+<Layout title="Não autorizado" profile={sessionProfile}>
+  <img src="/img/errors/403.png" alt="Erro 403" />
+</Layout>

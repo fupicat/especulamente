@@ -1,0 +1,28 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCurrentUserProfile, supabase } from "@/lib/supabaseServer";
+import { profilePicture } from "@/lib/clientShorthand";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+
+const profilesRequest = await supabase.from("profiles").select("*");
+
+const profiles = profilesRequest.data;
+---
+
+<Layout title="users" profile={sessionProfile}>
+  <h1>Usuários</h1>
+  {
+    profiles?.map((profile) => (
+      <a href={`/users/${profile.username}`} class="profile">
+        <h1>{profile.username}</h1>
+        <img
+          src={profilePicture(profile.avatar_url)}
+          alt={`Foto de perfil de ${profile.username}`}
+          width="200"
+          height="200"
+        />
+      </a>
+    ))
+  }
+</Layout>

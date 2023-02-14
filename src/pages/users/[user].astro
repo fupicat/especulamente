@@ -1,0 +1,34 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { profilePicture } from "@/lib/clientShorthand";
+import {
+  getCurrentUserProfile,
+  getProfileByUsername,
+} from "@/lib/supabaseServer";
+
+import { marked } from "marked";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+
+const profile = await getProfileByUsername(Astro.params.user);
+
+if (!profile) return Astro.redirect("/404");
+---
+
+<Layout title="user" profile={sessionProfile}>
+  {
+    profile && (
+      <div class="profile">
+        <h1>{profile.username}</h1>
+        <div class="bio" set:html={marked.parse(profile.bio)} />
+        <img
+          src={profilePicture(profile.avatar_url)}
+          alt={`Foto de perfil de ${profile.username}`}
+          width="200"
+          height="200"
+        />
+        <p class="date">{new Date(profile.created_at).toLocaleString("pt")}</p>
+      </div>
+    )
+  }
+</Layout>

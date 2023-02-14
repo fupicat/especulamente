@@ -1,0 +1,35 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { profilePicture } from "@/lib/clientShorthand";
+import { getCurrentUserProfile, supabase } from "@/lib/supabaseServer";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+
+const mediaRequest = await supabase
+  .from("media")
+  .select("*")
+  .order("created_at", { ascending: false });
+
+const media = mediaRequest.data;
+---
+
+<Layout title="media" profile={sessionProfile}>
+  <h1>Mídia</h1>
+  {
+    media?.map((item) => (
+      <a href={`/media/${item.id}`} class="profile">
+        <img
+          src={
+            item.nsfw
+              ? "/img/crucificamente.png"
+              : profilePicture(item.image_url)
+          }
+          alt={item.title}
+          width="200"
+          height="200"
+        />
+        <p>{item.title}</p>
+      </a>
+    ))
+  }
+</Layout>

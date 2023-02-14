@@ -1,0 +1,31 @@
+{
+  "name": "@example/basics",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/deno": "^3.0.0",
+    "@astrojs/svelte": "^1.0.2",
+    "@ffmpeg/core": "^0.11.0",
+    "@ffmpeg/ffmpeg": "^0.11.6",
+    "@supabase/supabase-js": "^2.4.0",
+    "@types/marked": "^4.0.8",
+    "astro": "^1.7.0",
+    "easymde": "^2.18.0",
+    "gsap": "^3.11.4",
+    "marked": "^4.2.12",
+    "node-fetch": "^3.3.0",
+    "sanitize-html": "^2.8.1",
+    "svelte": "^3.46.4"
+  },
+  "devDependencies": {
+    "sass": "^1.57.1"
+  }
+}

@@ -1,0 +1,77 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { profilePicture } from "@/lib/clientShorthand";
+import { getCurrentUserProfile } from "@/lib/supabaseServer";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+---
+
+<Layout title="user" profile={sessionProfile} id="editar_conta">
+  <form>
+    <label for="username">Nome de usuário</label>
+    <input
+      type="text"
+      id="username"
+      name="username"
+      pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      value={sessionProfile.username}
+    />
+    <label for="nickname">Apelido</label>
+    <input
+      type="text"
+      id="nickname"
+      name="nickname"
+      value={sessionProfile.nickname}
+    />
+    <label for="bio">Sobre mim</label>
+    <textarea class="bio" id="bio" name="bio" set:text={sessionProfile.bio} />
+    <label for="avatar">Avatar</label>
+    <img
+      id="avatar_img"
+      src={profilePicture(sessionProfile.avatar_url)}
+      alt={`Foto de perfil de ${sessionProfile.username}`}
+      width="200"
+      height="200"
+    />
+    <input type="file" accept="image/*" name="avatar" id="avatar" />
+    <button type="submit">salvar</button>
+  </form>
+</Layout>
+
+<script>
+  const avatarPicker = document.querySelector("#avatar") as HTMLInputElement;
+  const avatarImg = document.querySelector("#avatar_img") as HTMLImageElement;
+  const form = document.querySelector("#editar_conta form") as HTMLFormElement;
+
+  avatarPicker.addEventListener("change", (event) => {
+    const target = event.target as HTMLInputElement;
+    const fileUploaded = target.files ? target.files[0] : null;
+    if (fileUploaded) avatarImg.src = URL.createObjectURL(fileUploaded);
+  });
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    onSubmit();
+  });
+
+  async function onSubmit() {
+    const data = new FormData(form);
+
+    const response = await (
+      await fetch("/admin/actions/account", {
+        method: "put",
+        body: data,
+      })
+    ).json();
+
+    if (response.error) {
+      alert(response.error.message);
+      return;
+    }
+
+    const newUsername = (form.querySelector("#username") as HTMLInputElement)
+      .value;
+
+    window.location.href = `/users/${newUsername}`;
+  }
+</script>

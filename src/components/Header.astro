@@ -1,0 +1,383 @@
+---
+const { profile } = Astro.props;
+---
+
+<header>
+  <div class="top">
+    <div class="container">
+      <h1>especulamente.com.br</h1>
+      <a href="/" class="logo">
+        <img src="/img/especulamente.png" alt="Especulamente.com.br" />
+      </a>
+      <div class="menu">
+        <div class="nav-body">
+          <nav>
+            <a href="/games">
+              <div class="icon" style="width: 32px; margin-right: 8px;">
+                <img src="/img/sprites/jogos.png" alt="Jogos" />
+              </div>
+              <p class="hooge">JOGOS</p>
+            </a>
+            <img src="/img/sprites/separador.png" alt="" class="separator" />
+            <a href="/media">
+              <div class="icon" style="width: 29px; margin-right: 10px;">
+                <img src="/img/sprites/midia.png" alt="Mídia" />
+              </div>
+              <p class="hooge">MÍDIA</p>
+            </a>
+            <img src="/img/sprites/separador.png" alt="" class="separator" />
+            <a href="/blogs">
+              <div class="icon" style="width: 32px; margin-right: -2px;">
+                <img src="/img/sprites/blogs.png" alt="Blogs" />
+              </div>
+              <p class="hooge">BLOGS</p>
+            </a>
+            <img src="/img/sprites/separador.png" alt="" class="separator" />
+            <a href="/bofetadamente">
+              <div class="icon" style="width: 32px; margin-right: 9px;">
+                <img src="/img/sprites/bofetadamente.png" alt="Bofetadamente" />
+              </div>
+              <p class="hooge">BOFETADAMENTE</p>
+            </a>
+          </nav>
+          <div class="search arial">
+            <input type="search" />
+            <button>
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 11 11"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="3.88889" cy="3.88889" r="3.38889" stroke="#626B85"
+                ></circle>
+                <path d="M6.11108 6.11108L9.99997 9.99997" stroke="#626B85"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="nav-shadow"></div>
+        <div class="tools arial">
+          <p>áudio: <a href={Astro.url.href} id="audio-toggle">on</a></p>
+          {
+            profile ? (
+              <p>
+                olá de novo novamente,
+                <a href={`/users/${profile.username}`}>
+                  {profile.nickname || "nova conta"}
+                </a>
+                ~ <a href="/admin/editar/conta">configurações</a> ~
+                <a href="/" id="logout">
+                  sair
+                </a>
+              </p>
+            ) : (
+              <p>
+                <a href="/admin/login">login</a>
+              </p>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom"></div>
+</header>
+
+<script>
+  // Toggle de som e sons dos botões
+
+  import { audioOff } from "@/lib/audio";
+
+  const audioToggle =
+    document.querySelector<HTMLAnchorElement>("#audio-toggle");
+
+  if (audioOff) audioToggle!.textContent = "off";
+
+  audioToggle!.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (audioOff) localStorage.removeItem("audio-off");
+    else localStorage.setItem("audio-off", "true");
+
+    window.location.reload();
+  });
+</script>
+
+<script>
+  // Botão de logout e animação dos botões
+
+  import { supabase } from "../lib/supabaseClient";
+
+  document.querySelector("#logout")?.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    (async () => {
+      const { error } = await supabase.auth.signOut();
+
+      if (error) alert(error.message);
+    })();
+  });
+</script>
+
+<script>
+  // Menu
+
+  import { loadSample, playSample } from "@/lib/audio";
+  import gsap from "gsap";
+
+  (async () => {
+    const boing = await loadSample("/sfx/boing.wav");
+    const clink = await loadSample("/sfx/clink.ogg");
+
+    const menu = document.querySelector<HTMLDivElement>(".menu")!;
+    const navLinks =
+      document.querySelectorAll<HTMLAnchorElement>(".menu nav a");
+
+    const bounceDuration = 0.8;
+
+    navLinks.forEach((menuLink) => {
+      const icon = menuLink.querySelector<HTMLImageElement>("img");
+
+      menuLink.addEventListener("mouseenter", function () {
+        if (!menu.classList.contains("disabled")) {
+          playSample(boing);
+          gsap.to(icon, {
+            y: -8,
+            ease: "power2.out",
+            duration: bounceDuration / 4,
+          });
+          gsap.to(icon, {
+            y: 0,
+            ease: "bounce.out",
+            delay: bounceDuration / 4,
+            duration: bounceDuration / 2,
+          });
+        }
+      });
+
+      menuLink.addEventListener("click", () => {
+        playSample(clink);
+        menu.classList.add("disabled");
+        navLinks.forEach((btn) => btn.classList.remove("clink"));
+        menuLink.classList.add("clink");
+      });
+    });
+  })();
+</script>
+
+<style lang="scss">
+  header {
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.7);
+
+    .top {
+      background: url("/img/sprites/header-grid.png");
+      background-position: left bottom;
+      image-rendering: pixelated;
+
+      .container {
+        display: flex;
+        gap: 0.5625rem;
+        padding-top: 0.875rem;
+
+        > h1 {
+          display: none;
+        }
+
+        .logo {
+          display: flex;
+          align-items: flex-start;
+
+          img {
+            max-width: 16.875rem;
+          }
+        }
+
+        .menu {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+
+          &.disabled {
+            .nav-body {
+              background: linear-gradient(
+                0deg,
+                #6977a0af 0%,
+                #9099b8af 39.58%,
+                #edeff4af 85.94%,
+                #5f6e9aaf 100%
+              );
+
+              nav a {
+                opacity: 0.6;
+                transition: none;
+
+                &.clink {
+                  opacity: 1;
+
+                  p {
+                    text-shadow: 0px 0px 12px white, 0px 0px 6px white;
+                  }
+
+                  &:hover p {
+                    text-shadow: 0px 0px 12px white, 0px 0px 6px white;
+                  }
+                }
+
+                &:hover p {
+                  text-shadow: none;
+                }
+              }
+            }
+          }
+
+          .nav-body {
+            display: flex;
+            gap: 13px;
+            justify-content: space-between;
+            margin-top: 12px;
+            width: 100%;
+            height: 24px;
+            padding-right: 3px;
+            background: linear-gradient(
+              0deg,
+              #6977a0 0%,
+              #9099b8 39.58%,
+              #edeff4 85.94%,
+              #5f6e9a 100%
+            );
+            border: 1px solid #32457d;
+            box-shadow: inset -8px 0px 8px -8px #112564,
+              inset 8px 0px 8px -8px #112564;
+
+            nav {
+              width: 100%;
+
+              display: flex;
+
+              align-items: flex-end;
+
+              a {
+                display: flex;
+                padding-left: 11px;
+                padding-right: 11px;
+
+                position: relative;
+
+                .icon {
+                  position: relative;
+                  bottom: 2px;
+
+                  img {
+                    position: absolute;
+                    bottom: 0;
+                  }
+                }
+
+                &:hover {
+                  p {
+                    text-shadow: 0px 0px 12px white, 0px 0px 6px white;
+                  }
+                }
+
+                p {
+                  font-style: normal;
+                  font-weight: 400;
+                  font-size: 8px;
+                  line-height: 9px;
+
+                  color: #2d417a;
+                  margin-bottom: 7px;
+
+                  position: relative;
+
+                  text-shadow: 0px 0px 0px transparent, 0px 0px 0px transparent;
+                  transition: text-shadow 0.4s
+                    cubic-bezier(0.075, 0.82, 0.165, 1);
+                }
+              }
+
+              .separator {
+                margin-bottom: 1px;
+              }
+            }
+
+            .search {
+              width: 100%;
+              display: flex;
+              background: #ffffff;
+              border: 1px solid #626b85;
+              height: 16px;
+
+              align-self: center;
+
+              input {
+                width: 100%;
+                height: 16px;
+                border: none;
+                background: transparent;
+
+                font-size: 10px;
+              }
+
+              button {
+                height: 16px;
+                width: 16px;
+
+                border: none;
+                background: transparent;
+
+                cursor: pointer;
+              }
+            }
+          }
+
+          .nav-shadow {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(
+              180deg,
+              rgba(50, 69, 125, 0.8) 0%,
+              rgba(50, 69, 125, 0) 100%
+            );
+            bottom: 0;
+          }
+
+          .tools {
+            font-style: normal;
+            font-weight: 400;
+            font-size: 10px;
+            line-height: 11px;
+
+            color: #ffffff;
+
+            display: flex;
+            justify-content: space-between;
+
+            margin-top: 4px;
+
+            a {
+              color: #6cb2ff;
+
+              display: inline-block;
+
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .bottom {
+      width: 100%;
+      height: 16px;
+
+      background: url("/img/sprites/header-grid-bottom.png");
+      image-rendering: pixelated;
+    }
+  }
+</style>

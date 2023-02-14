@@ -1,0 +1,51 @@
+---
+import Cramunhao from "@/components/home/Cramunhao.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getCurrentUserProfile } from "@/lib/supabaseServer";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+---
+
+<Layout title="home" profile={sessionProfile}>
+  <div>
+    <Cramunhao />
+  </div>
+</Layout>
+
+<script>
+  // const musicas = [
+  //   "/music/last_passo.mp3",
+  //   "/music/jogo_dificil.mp3",
+  //   "/music/sonho_escape.mp3",
+  // ];
+
+  // function shuffle(array: Array<any>) {
+  //   let currentIndex = array.length,
+  //     randomIndex;
+
+  //   while (currentIndex != 0) {
+  //     randomIndex = Math.floor(Math.random() * currentIndex);
+  //     currentIndex--;
+
+  //     [array[currentIndex], array[randomIndex]] = [
+  //       array[randomIndex],
+  //       array[currentIndex],
+  //     ];
+  //   }
+
+  //   return array;
+  // }
+
+  // shuffle(musicas);
+
+  // var audio = new Audio(musicas[0]);
+  // audio.loop = true;
+  // audio.play();
+</script>
+
+<style>
+  div {
+    display: flex;
+    justify-content: center;
+  }
+</style>

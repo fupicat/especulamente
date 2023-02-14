@@ -1,0 +1,80 @@
+---
+---
+
+<style lang="scss" is:global>
+  html,
+  body {
+    padding: 0;
+    margin: 0;
+    font-family: "Courier New", Courier, monospace;
+  }
+  body {
+    background-color: #89a7bc;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  .no-overflow {
+    overflow: hidden;
+  }
+  .no-overflow-x {
+    overflow-x: hidden;
+  }
+  .container {
+    max-width: 64rem;
+    width: 100%;
+    margin: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .mob {
+    @media (min-width: 769px) {
+      display: none !important;
+    }
+  }
+  .pc {
+    @media (max-width: 768px) {
+      display: none !important;
+    }
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .underline {
+    &a:hover {
+      text-decoration: underline;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: normal;
+  }
+
+  /* Fonts */
+
+  .arial {
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+  }
+
+  @font-face {
+    font-family: "Hooge";
+    src: url("/fonts/hooge.ttf") format("truetype");
+  }
+
+  .hooge {
+    font-family: "Hooge", "Courier New", Courier, monospace;
+  }
+</style>

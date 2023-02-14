@@ -1,0 +1,98 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCurrentUserProfile } from "@/lib/supabaseServer";
+
+const sessionProfile = await getCurrentUserProfile(Astro);
+
+if (!sessionProfile) return Astro.redirect("/403");
+---
+
+<Layout title="criar mídia" id="criar_midia" profile={sessionProfile}>
+  <form>
+    <label for="file">
+      Escolha um arquivo (imagem até 10MB, vídeo até 200MB, áudio até 100MB)
+    </label>
+    <input type="file" name="file" id="file" />
+
+    <p>OU</p>
+
+    <label for="url">
+      Cole um URL (link direto de uma imagem ou vídeo no YouTube)
+    </label>
+    <input type="text" name="url" id="url" />
+
+    <p>
+      Atenção, se vc for upar um vídeo, ele VAI perder qualidade. Se não quiser
+      isso, sugiro só postar o vídeo no YouTube e colar o URL ali em cima.
+    </p>
+    <p>
+      Se vc upar uma música, um vídeo será automaticamente criado com a sua
+      thumbnail.
+    </p>
+
+    <label for="thumbnail"
+      >Thumbnail APENAS PARA VÍDEOS E ÁUDIOS (opcional)</label
+    >
+    <img
+      id="thumbnail_img"
+      src="/img/defaultpfp.png"
+      alt="Thumbnail"
+      width="200"
+    />
+    <input type="file" name="thumbnail" id="thumbnail" />
+
+    <label for="title">Título</label>
+    <input type="text" name="title" id="title" required />
+
+    <label for="title">Descrição</label>
+    <textarea name="description" id="description" cols="30" rows="10"
+    ></textarea>
+
+    <label for="tags">Tags (separadas por vírgulas)</label>
+    <input type="text" name="tags" id="tags" />
+
+    <label for="nsfw">Crucificamente</label>
+    <input type="checkbox" name="nsfw" id="nsfw" />
+
+    <button type="submit">Enviar!</button>
+  </form>
+</Layout>
+
+<script>
+  const thumbnailPicker = document.querySelector(
+    "#thumbnail"
+  ) as HTMLInputElement;
+  const thumbnailImg = document.querySelector(
+    "#thumbnail_img"
+  ) as HTMLImageElement;
+  const form = document.querySelector("#criar_midia form") as HTMLFormElement;
+
+  thumbnailPicker.addEventListener("change", (event) => {
+    const target = event.target as HTMLInputElement;
+    const fileUploaded = target.files ? target.files[0] : null;
+    if (fileUploaded) thumbnailImg.src = URL.createObjectURL(fileUploaded);
+  });
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    onSubmit();
+  });
+
+  async function onSubmit() {
+    const data = new FormData(form);
+
+    const response = await (
+      await fetch("/admin/actions/media", {
+        method: "post",
+        body: data,
+      })
+    ).json();
+
+    if (response.error) {
+      alert(response.error.message);
+      return;
+    }
+
+    window.location.href = `/media/${response.data.id}`;
+  }
+</script>
