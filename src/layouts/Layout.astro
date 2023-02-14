@@ -36,6 +36,7 @@ const { title, profile, id } = Astro.props;
 </html>
 
 <script>
+  // Detector de logout
   import { supabase } from "../lib/supabaseClient";
 
   supabase.auth.onAuthStateChange((event, session) => {
@@ -50,6 +51,31 @@ const { title, profile, id } = Astro.props;
       document.cookie = `my-refresh-token=${session?.refresh_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`;
     }
   });
+</script>
+
+<script>
+  // Easter egg
+
+  console.log(
+    `%c
+             ,´\`.
+           ,'    '.
+         ,'        '.
+       ,'            '.     ei
+     ,'                '.
+   ,'                    '.
+ ,'                        '.
+<             :]             >
+ '.                        ,'
+   '.                    ,'
+     '.                ,'
+       '.            ,'      oqq tu pensa
+         '.        ,'     q tá procurando?
+           '.    ,'
+             '.,'
+`,
+    "color: #375bfd"
+  );
 </script>
 
 <GlobalStyles />
