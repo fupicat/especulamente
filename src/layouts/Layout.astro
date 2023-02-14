@@ -28,7 +28,7 @@ const { title, profile, id } = Astro.props;
   </head>
   <body>
     <Header profile={profile} />
-    <main id={id} class="container">
+    <main id={id}>
       <slot />
     </main>
     <Footer />
@@ -54,8 +54,19 @@ const { title, profile, id } = Astro.props;
 
 <GlobalStyles />
 
+<style lang="scss">
+  main {
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0px 0px 14px 2px #000000;
+
+    max-width: 64rem;
+    width: 100%;
+    margin: auto;
+  }
+</style>
+
 <noscript>
-  <style lang="scss" is:global>
+  <style>
     .js-only {
       display: none !important;
     }
