@@ -1,4 +1,5 @@
 ---
+import Footer from "@/components/Footer.astro";
 import GlobalStyles from "@/components/GlobalStyles.astro";
 import Header from "@/components/Header.astro";
 
@@ -30,9 +31,7 @@ const { title, profile, id } = Astro.props;
     <main id={id} class="container">
       <slot />
     </main>
-    <footer>
-      <a href="/creditos">Créditos</a>
-    </footer>
+    <Footer />
   </body>
 </html>
 
