@@ -11,7 +11,7 @@ const media = await Media.get(Astro.params.id);
 if (!media) return Astro.redirect("/404");
 ---
 
-<Layout title="media" profile={sessionProfile}>
+<Layout title={media.title} profile={sessionProfile}>
   {
     media && (
       <div class="media">

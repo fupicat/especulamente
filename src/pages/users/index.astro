@@ -9,7 +9,7 @@ const sessionProfile = await Profile.current(Astro);
 const profiles = await Profile.all();
 ---
 
-<Layout title="users" profile={sessionProfile}>
+<Layout title="Usuários" profile={sessionProfile}>
   <h1>Usuários</h1>
   {
     profiles?.map((profile) => (

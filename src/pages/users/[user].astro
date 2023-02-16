@@ -12,7 +12,7 @@ const profile = await Profile.get({ username: Astro.params.user });
 if (!profile) return Astro.redirect("/404");
 ---
 
-<Layout title="user" profile={sessionProfile}>
+<Layout title={profile.nickname} profile={sessionProfile}>
   {
     profile && (
       <div class="profile">

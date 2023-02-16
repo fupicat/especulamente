@@ -13,7 +13,11 @@ if (!sessionProfile || sessionProfile.id !== media.author.id)
   return Astro.redirect("/403");
 ---
 
-<Layout title="criar mídia" id="editar_midia" profile={sessionProfile}>
+<Layout
+  title={`Editando mídia ${media.title}`}
+  id="editar_midia"
+  profile={sessionProfile}
+>
   <h1>Editando mídia</h1>
   <form>
     <input type="hidden" name="id" value={media.id} />

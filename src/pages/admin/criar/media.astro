@@ -7,7 +7,7 @@ const sessionProfile = await Profile.current(Astro);
 if (!sessionProfile) return Astro.redirect("/403");
 ---
 
-<Layout title="criar mídia" id="criar_midia" profile={sessionProfile}>
+<Layout title="Criando mídia" id="criar_midia" profile={sessionProfile}>
   <form>
     <label for="file">
       Escolha um arquivo (imagem até 10MB, vídeo até 200MB, áudio até 100MB)

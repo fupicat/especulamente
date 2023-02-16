@@ -7,7 +7,7 @@ import Profile from "@/models/Profile";
 const sessionProfile = await Profile.current(Astro);
 ---
 
-<Layout title="home" profile={sessionProfile}>
+<Layout profile={sessionProfile}>
   <div class="container">
     <Cramunhao />
     <BarraDoLado />

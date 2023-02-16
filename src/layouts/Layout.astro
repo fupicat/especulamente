@@ -5,7 +5,7 @@ import Header from "@/components/Header.astro";
 import type { ProfileType } from "@/models/Profile";
 
 export interface Props {
-  title: string;
+  title?: string;
   profile: ProfileType | null;
   id?: string;
 }
@@ -20,7 +20,13 @@ const { title, profile, id } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <title>
+      {
+        title
+          ? `${title} ⬦ Especulamente`
+          : "Especulamente: Seu WWW é WWW Épico"
+      }
+    </title>
 
     <link
       rel="stylesheet"

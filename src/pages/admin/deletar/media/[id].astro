@@ -14,7 +14,11 @@ if (!sessionProfile || sessionProfile.id !== media.author.id)
   return Astro.redirect("/403");
 ---
 
-<Layout title="deletar mídia" id="deletar_midia" profile={sessionProfile}>
+<Layout
+  title={`Deletando mídia ${media.title}`}
+  id="deletar_midia"
+  profile={sessionProfile}
+>
   <h1>Deletando mídia</h1>
   <form>
     <input type="hidden" name="id" value={media.id} />

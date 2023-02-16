@@ -5,7 +5,7 @@ import Profile from "@/models/Profile";
 const sessionProfile = await Profile.current(Astro);
 ---
 
-<Layout title="criar conta" profile={sessionProfile} id="login-page">
+<Layout title="Login" profile={sessionProfile} id="login-page">
   {
     sessionProfile ? (
       <p>bruh vc já está logado</p>

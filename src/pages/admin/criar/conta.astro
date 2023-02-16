@@ -7,7 +7,7 @@ const sessionProfile = await Profile.current(Astro);
 if (!sessionProfile) return Astro.redirect("/403");
 ---
 
-<Layout title="criar conta" profile={sessionProfile}>
+<Layout title="Criando conta" profile={sessionProfile}>
   <form id="definir_senha">
     <label for="username">Username</label>
     <input type="text" name="username" id="username" />

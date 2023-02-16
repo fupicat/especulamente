@@ -9,7 +9,7 @@ const sessionProfile = await Profile.current(Astro);
 const media = await Media.all();
 ---
 
-<Layout title="media" profile={sessionProfile}>
+<Layout title="Mídia" profile={sessionProfile}>
   <h1>Mídia</h1>
   {
     media?.map((item) => (
