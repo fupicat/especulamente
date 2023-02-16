@@ -1,15 +1,16 @@
 ---
 import "easymde/dist/easymde.min.css";
 import Layout from "@/layouts/Layout.astro";
-import { getCurrentUserProfile, getMediaByID } from "@/lib/supabaseServer";
+import Profile from "@/models/Profile";
+import Media from "@/models/Media";
 
-const sessionProfile = await getCurrentUserProfile(Astro);
+const sessionProfile = await Profile.current(Astro);
 
-const media = await getMediaByID(Astro.params.id);
+const media = await Media.get(Astro.params.id);
 
+if (!media) return Astro.redirect("/404");
 if (!sessionProfile || sessionProfile.id !== media.author.id)
   return Astro.redirect("/403");
-if (!media) return Astro.redirect("/404");
 ---
 
 <Layout title="criar mídia" id="editar_midia" profile={sessionProfile}>

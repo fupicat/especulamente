@@ -1,0 +1,122 @@
+import { getCookie } from "@/lib/serverShorthand";
+import { getUser, server } from "@/lib/supabaseServer";
+import type { AstroGlobal } from "astro";
+
+export interface ProfileType {
+  username: string;
+  id: string;
+  nickname: string;
+  avatar_url: string | null;
+  bio: string;
+  created_at: Date;
+}
+
+export interface ProfileEditable {
+  username?: string | null;
+  nickname?: string | null;
+  avatar_url?: string | null;
+  bio?: string;
+}
+
+export default class Profile {
+  static placeholders: ProfileType[] = new Array(20).fill({
+    id: "00000000-0000-0000-0000-0000000000",
+    username: "placeholder",
+    nickname: "Placeholder",
+    avatar_url: null,
+    bio: "Bio placeholder para o usuário placeholder!!",
+    created_at: new Date(),
+  });
+
+  static async get({
+    username,
+    id,
+  }: {
+    username?: string;
+    id?: string;
+  }): Promise<ProfileType | null> {
+    if (!server) {
+      if (username)
+        return this.placeholders.find((p) => p.username === username) || null;
+      if (id) return this.placeholders.find((p) => p.id === id) || null;
+      return null;
+    }
+
+    if (username) {
+      const { data, error } = await server
+        .from("profiles")
+        .select("*")
+        .eq("username", username)
+        .single();
+
+      if (error) throw error;
+
+      return data || null;
+    }
+
+    if (id) {
+      const { data, error } = await server
+        .from("profiles")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) throw error;
+
+      return data || null;
+    }
+
+    return null;
+  }
+
+  static async all(): Promise<ProfileType[]> {
+    if (!server) return this.placeholders;
+
+    const { data, error } = await server.from("profiles").select("*");
+
+    if (error) throw error;
+
+    return data;
+  }
+
+  static async put(id: string, fields: ProfileEditable): Promise<ProfileType> {
+    if (!server) return this.placeholders[0];
+
+    const { data, error } = await server
+      .from("profiles")
+      .update(fields)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data;
+  }
+
+  /**
+   * Obtém a profile do usuário logado.
+   *
+   * @param req
+   * @returns
+   */
+  static async current(
+    req: Readonly<AstroGlobal<Record<string, any>>> | Request
+  ): Promise<ProfileType | null> {
+    if (!server) return null;
+    const user =
+      req instanceof Request
+        ? await getUser(
+            getCookie(req, "my-refresh-token"),
+            getCookie(req, "my-access-token")
+          )
+        : await getUser(
+            req.cookies.get("my-refresh-token").value,
+            req.cookies.get("my-access-token").value
+          );
+
+    if (!user) return null;
+
+    return await this.get({ id: user.id });
+  }
+}

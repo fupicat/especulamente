@@ -1,4 +1,10 @@
 ---
+import type { ProfileType } from "@/models/Profile";
+
+export interface Props {
+  profile: ProfileType | null;
+}
+
 const { profile } = Astro.props;
 ---
 

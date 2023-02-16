@@ -1,11 +1,12 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { getCurrentUserProfile, getMediaByID } from "@/lib/supabaseServer";
 import { marked } from "marked";
+import Profile from "@/models/Profile";
+import Media from "@/models/Media";
 
-const sessionProfile = await getCurrentUserProfile(Astro);
+const sessionProfile = await Profile.current(Astro);
 
-const media = await getMediaByID(Astro.params.id);
+const media = await Media.get(Astro.params.id);
 
 if (!media) return Astro.redirect("/404");
 ---
@@ -14,7 +15,7 @@ if (!media) return Astro.redirect("/404");
   {
     media && (
       <div class="media">
-        {media.author.id === sessionProfile.id && (
+        {media.author.id === sessionProfile?.id && (
           <a href={`/admin/editar/media/${media.id}`}>Editar mídia</a>
         )}
         <h1>{media.title}</h1>
@@ -45,7 +46,7 @@ if (!media) return Astro.redirect("/404");
           </div>
         )}
         <div class="description" set:html={marked.parse(media.description)} />
-        <p class="date">{new Date(media.created_at).toLocaleString("pt")}</p>
+        <p class="date">{media.created_at!.toLocaleString("pt")}</p>
         <p>
           <b>Tags</b>
         </p>

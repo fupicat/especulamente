@@ -53,8 +53,7 @@ export async function uploadVideo(file: File | null) {
   const uploaded = (await (
     await fetch("https://api.imgur.com/3/upload", request)
   ).json()) as any;
-  if (!uploaded.success) {
-    throw new Error(JSON.stringify(uploaded));
-  }
+  if (!uploaded.success) throw uploaded;
+
   return uploaded.data.link;
 }

@@ -2,10 +2,11 @@
 import Footer from "@/components/Footer.astro";
 import GlobalStyles from "@/components/GlobalStyles.astro";
 import Header from "@/components/Header.astro";
+import type { ProfileType } from "@/models/Profile";
 
 export interface Props {
   title: string;
-  profile: any | null;
+  profile: ProfileType | null;
   id?: string;
 }
 

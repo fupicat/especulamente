@@ -1,14 +1,16 @@
 ---
+import BarraDoLado from "@/components/BarraDoLado.astro";
 import Cramunhao from "@/components/home/Cramunhao.astro";
 import Layout from "@/layouts/Layout.astro";
-import { getCurrentUserProfile } from "@/lib/supabaseServer";
+import Profile from "@/models/Profile";
 
-const sessionProfile = await getCurrentUserProfile(Astro);
+const sessionProfile = await Profile.current(Astro);
 ---
 
 <Layout title="home" profile={sessionProfile}>
-  <div>
+  <div class="container">
     <Cramunhao />
+    <BarraDoLado />
   </div>
 </Layout>
 

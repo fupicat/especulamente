@@ -1,16 +1,12 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { profilePicture } from "@/lib/clientShorthand";
-import { getCurrentUserProfile, supabase } from "@/lib/supabaseServer";
+import Media from "@/models/Media";
+import Profile from "@/models/Profile";
 
-const sessionProfile = await getCurrentUserProfile(Astro);
+const sessionProfile = await Profile.current(Astro);
 
-const mediaRequest = await supabase
-  .from("media")
-  .select("*")
-  .order("created_at", { ascending: false });
-
-const media = mediaRequest.data;
+const media = await Media.all();
 ---
 
 <Layout title="media" profile={sessionProfile}>

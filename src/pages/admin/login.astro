@@ -1,8 +1,8 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getCurrentUserProfile } from "../../lib/supabaseServer";
+import Profile from "@/models/Profile";
 
-const sessionProfile = await getCurrentUserProfile(Astro);
+const sessionProfile = await Profile.current(Astro);
 ---
 
 <Layout title="criar conta" profile={sessionProfile} id="login-page">

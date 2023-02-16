@@ -1,16 +1,13 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { profilePicture } from "@/lib/clientShorthand";
-import {
-  getCurrentUserProfile,
-  getProfileByUsername,
-} from "@/lib/supabaseServer";
+import Profile from "@/models/Profile";
 
 import { marked } from "marked";
 
-const sessionProfile = await getCurrentUserProfile(Astro);
+const sessionProfile = await Profile.current(Astro);
 
-const profile = await getProfileByUsername(Astro.params.user);
+const profile = await Profile.get({ username: Astro.params.user });
 
 if (!profile) return Astro.redirect("/404");
 ---

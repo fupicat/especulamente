@@ -1,13 +1,12 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { getCurrentUserProfile, supabase } from "@/lib/supabaseServer";
+import { server } from "@/lib/supabaseServer";
 import { profilePicture } from "@/lib/clientShorthand";
+import Profile from "@/models/Profile";
 
-const sessionProfile = await getCurrentUserProfile(Astro);
+const sessionProfile = await Profile.current(Astro);
 
-const profilesRequest = await supabase.from("profiles").select("*");
-
-const profiles = profilesRequest.data;
+const profiles = await Profile.all();
 ---
 
 <Layout title="users" profile={sessionProfile}>

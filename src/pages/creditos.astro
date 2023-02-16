@@ -1,13 +1,30 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { getCurrentUserProfile } from "@/lib/supabaseServer";
+import Profile from "@/models/Profile";
 
-const sessionProfile = await getCurrentUserProfile(Astro);
+const sessionProfile = await Profile.current(Astro);
 ---
 
 <Layout title="home" profile={sessionProfile}>
-  <h1>Créditos</h1>
-  <p>Tudo: Hawnt</p>
-  <p>Tudo de novo: Hawnt</p>
-  <p>Splats: Hawnt</p>
+  <div class="container">
+    <h1 class="hooge">Créditos</h1>
+    <article>
+      <p>Tudo: Hawnt</p>
+      <p>Tudo de novo: Hawnt</p>
+      <p>Splats: Hawnt</p>
+    </article>
+  </div>
 </Layout>
+
+<style lang="scss">
+  .container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+
+    article {
+      margin-top: 1rem;
+
+      min-height: 16rem;
+    }
+  }
+</style>

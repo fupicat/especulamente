@@ -1,9 +1,11 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { profilePicture } from "@/lib/clientShorthand";
-import { getCurrentUserProfile } from "@/lib/supabaseServer";
+import Profile from "@/models/Profile";
 
-const sessionProfile = await getCurrentUserProfile(Astro);
+const sessionProfile = await Profile.current(Astro);
+
+if (!sessionProfile) return Astro.redirect("/404");
 ---
 
 <Layout title="user" profile={sessionProfile} id="editar_conta">
