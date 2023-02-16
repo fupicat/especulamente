@@ -1,4 +1,152 @@
 ---
 ---
 
-<aside></aside>
+<aside>
+  <div class="top"></div>
+  <div class="bottom">
+    <img src="/img/sprites/barra-do-lado.png" alt="Barra do lado" />
+    <div class="box">
+      <div class="header"><p class="hooge">novidades</p></div>
+      <div class="project-list">
+        {
+          [0, 0, 0, 0, 0].map((project) => (
+            <a href="/">
+              <div class="thumbnail">
+                <img class="static" src="/img/static.gif" alt="" />
+                <img class="icon" src="/img/sprites/jogos.png" alt="Jogo" />
+                <img class="image" src="/img/defaultpfp.png" alt="Thumbnail" />
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</aside>
+
+<script>
+  import { loadSample, playSample } from "@/lib/audio";
+
+  (async () => {
+    const tvOn = await loadSample("/sfx/tv-on.wav");
+
+    const tvStatic = new Audio("/sfx/tv-static.wav");
+    tvStatic.loop = true;
+
+    const projectLinks =
+      document.querySelectorAll<HTMLAnchorElement>(".project-list a");
+
+    projectLinks.forEach((link) => {
+      link.addEventListener("mouseenter", function () {
+        playSample(tvOn);
+        tvStatic.play();
+      });
+
+      link.addEventListener("mouseleave", function () {
+        tvStatic.pause();
+      });
+    });
+  })();
+</script>
+
+<style lang="scss">
+  aside {
+    display: flex;
+    flex-direction: column;
+    width: 15.875rem;
+
+    .top {
+      height: 8px;
+      image-rendering: pixelated;
+      background: url("/img/sprites/barra-do-lado-grid-topo.png");
+    }
+
+    .bottom {
+      image-rendering: pixelated;
+      background: url("/img/sprites/cramunhao-grid.png");
+
+      > img {
+        margin-left: 1rem;
+        margin-top: 0.25rem;
+      }
+
+      .box {
+        margin-left: 0.1875rem;
+        margin-right: 0.1875rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.1875rem;
+        position: relative;
+        padding: 0.5rem;
+
+        &::before {
+          content: "";
+          mix-blend-mode: overlay;
+          opacity: 0.6;
+          border: 2px solid #ffffff;
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+        }
+
+        .header {
+          background: rgb(255, 255, 255, 0.2);
+          border: 2px solid rgb(0, 0, 0, 0.2);
+
+          p {
+            font-style: normal;
+            font-weight: 400;
+            font-size: 0.875rem;
+            line-height: 1rem;
+
+            color: #ffffff;
+            margin-left: 2px;
+          }
+        }
+
+        .project-list {
+          display: flex;
+          flex-direction: column;
+
+          a {
+            display: flex;
+
+            &:hover {
+              .thumbnail .static,
+              .thumbnail .icon {
+                display: block;
+              }
+            }
+
+            .thumbnail {
+              position: relative;
+
+              .image,
+              .static {
+                width: 4rem;
+                height: 3rem;
+              }
+
+              .static {
+                box-shadow: inset 0px 0px 6px #ffffff;
+                position: absolute;
+                opacity: 0.7;
+                display: none;
+              }
+
+              .icon {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -60%);
+                filter: drop-shadow(0px 0px 6px #ffffff);
+                display: none;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+</style>
