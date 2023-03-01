@@ -7,7 +7,7 @@ import Profile from "@/models/Profile";
 const sessionProfile = await Profile.current(Astro);
 ---
 
-<Layout profile={sessionProfile}>
+<Layout profile={sessionProfile} id="home">
   <div class="container">
     <Cramunhao />
     <BarraDoLado />
@@ -45,9 +45,15 @@ const sessionProfile = await Profile.current(Astro);
   // audio.play();
 </script>
 
-<style lang="scss">
-  .container {
-    display: flex;
-    justify-content: space-between;
+<style lang="scss" is:global>
+  #home {
+    .container {
+      display: flex;
+      justify-content: space-between;
+
+      #barra-do-lado {
+        margin-top: 19px;
+      }
+    }
   }
 </style>

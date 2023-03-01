@@ -1,7 +1,8 @@
 ---
+import { profilePicture } from "@/lib/clientShorthand";
 ---
 
-<aside>
+<aside id="barra-do-lado">
   <div class="top"></div>
   <div class="bottom">
     <img src="/img/sprites/barra-do-lado.png" alt="Barra do lado" />
@@ -10,13 +11,28 @@
       <div class="project-list">
         {
           [0, 0, 0, 0, 0].map((project) => (
-            <a href="/">
-              <div class="thumbnail">
+            <div class="project arial">
+              <a href="/" class="thumbnail">
                 <img class="static" src="/img/static.gif" alt="" />
                 <img class="icon" src="/img/sprites/jogos.png" alt="Jogo" />
                 <img class="image" src="/img/defaultpfp.png" alt="Thumbnail" />
+              </a>
+              <div class="info">
+                <a href="/" class="title">
+                  Esse jogo esse jogo esse jogo esse jogo esse jogo esse jogo
+                </a>
+                <a href="/users/fupicat" class="user">
+                  <img
+                    src={profilePicture(null)}
+                    alt="Foto de perfil de Fupicat"
+                  />
+                  <div class="info">
+                    <p class="time">6 horas atrás</p>
+                    <p class="title">fupicat, o legal</p>
+                  </div>
+                </a>
               </div>
-            </a>
+            </div>
           ))
         }
       </div>
@@ -25,35 +41,44 @@
 </aside>
 
 <script>
-  import { loadSample, playSample } from "@/lib/audio";
+  import {
+    loadLoop,
+    loadSample,
+    playLoop,
+    playSample,
+    pauseLoop,
+  } from "@/lib/audio";
 
   (async () => {
     const tvOn = await loadSample("/sfx/tv-on.wav");
 
-    const tvStatic = new Audio("/sfx/tv-static.wav");
-    tvStatic.loop = true;
+    const tvStatic = loadLoop("/sfx/tv-static.wav", {
+      volume: 0.5,
+      loop: true,
+    });
 
-    const projectLinks =
-      document.querySelectorAll<HTMLAnchorElement>(".project-list a");
+    const projectLinks = document.querySelectorAll<HTMLAnchorElement>(
+      ".project-list .project .thumbnail"
+    );
 
     projectLinks.forEach((link) => {
-      link.addEventListener("mouseenter", function () {
+      link.addEventListener("mouseenter", () => {
         playSample(tvOn);
-        tvStatic.play();
+        playLoop(tvStatic);
       });
 
-      link.addEventListener("mouseleave", function () {
-        tvStatic.pause();
+      link.addEventListener("mouseleave", () => {
+        pauseLoop(tvStatic);
       });
     });
   })();
 </script>
 
-<style lang="scss">
-  aside {
+<style lang="scss" is:global>
+  #barra-do-lado {
     display: flex;
     flex-direction: column;
-    width: 15.875rem;
+    max-width: 15.875rem;
 
     .top {
       height: 8px;
@@ -88,6 +113,7 @@
           right: 0;
           bottom: 0;
           left: 0;
+          pointer-events: none;
         }
 
         .header {
@@ -106,21 +132,25 @@
         }
 
         .project-list {
+          margin-top: 9px;
           display: flex;
           flex-direction: column;
 
-          a {
+          .project {
             display: flex;
-
-            &:hover {
-              .thumbnail .static,
-              .thumbnail .icon {
-                display: block;
-              }
-            }
+            align-items: flex-start;
+            gap: 6px;
 
             .thumbnail {
               position: relative;
+              width: 4rem;
+
+              &:hover {
+                .static,
+                .icon {
+                  display: block;
+                }
+              }
 
               .image,
               .static {
@@ -142,6 +172,57 @@
                 transform: translate(-50%, -60%);
                 filter: drop-shadow(0px 0px 6px #ffffff);
                 display: none;
+              }
+            }
+
+            .info {
+              display: flex;
+              flex-direction: column;
+              width: 100%;
+              gap: 2px;
+              overflow: hidden;
+
+              .title {
+                display: block;
+                font-style: normal;
+                font-weight: 700;
+                font-size: 0.75rem;
+                line-height: 0.875rem;
+
+                color: #ffffff;
+
+                white-space: nowrap;
+
+                text-overflow: ellipsis;
+                overflow: hidden;
+              }
+
+              .user {
+                display: flex;
+                gap: 6px;
+                align-items: flex-end;
+
+                img {
+                  width: 32px;
+                  height: 32px;
+                }
+
+                .info {
+                  gap: 0px;
+
+                  .time {
+                    font-style: normal;
+                    font-weight: 400;
+                    font-size: 0.625rem;
+                    line-height: 0.6875rem;
+
+                    color: rgba(255, 255, 255, 0.4);
+                  }
+
+                  .title {
+                    color: rgba(255, 255, 255, 0.6);
+                  }
+                }
               }
             }
           }
