@@ -1,8 +1,8 @@
 ---
-import type { ProfileType } from "@/models/Profile";
+import type { ProfileData } from "@/models/Profile";
 
 export interface Props {
-  profile: ProfileType | null;
+  profile: ProfileData | null;
 }
 
 const { profile } = Astro.props;
@@ -33,7 +33,7 @@ const { profile } = Astro.props;
             </a>
             <img src="/img/sprites/separador.png" alt="" class="separator" />
             <a href="/blogs">
-              <div class="icon" style="width: 32px; margin-right: -2px;">
+              <div class="icon" style="width: 32px; margin-right: 6px;">
                 <img src="/img/sprites/blogs.png" alt="Blogs" />
               </div>
               <p class="hooge">BLOGS</p>

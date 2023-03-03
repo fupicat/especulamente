@@ -4,15 +4,19 @@ import type { APIRoute } from "astro";
 import sanitizeHtml from "sanitize-html";
 import { sanitizeHTMLOptions } from "@/lib/consts";
 import { errorResponse } from "@/lib/serverShorthand";
-import Media, { MediaEditable, MediaCreatable } from "@/models/Media";
-import Profile, { ProfileType } from "@/models/Profile";
+import Media, {
+  MediaEditable,
+  MediaCreatable,
+  MediaContent,
+} from "@/models/Media";
+import Profile, { ProfileData } from "@/models/Profile";
 import { getLoggedInID } from "@/lib/supabaseServer";
 
 async function resolveMediaUpload(
-  oldFields: MediaCreatable | MediaEditable,
+  content: MediaContent,
   form: FormData
-): Promise<MediaCreatable | MediaEditable | null> {
-  const fields: MediaCreatable | MediaEditable = { ...oldFields };
+): Promise<MediaContent | null> {
+  const fields: MediaContent = { ...content };
   const uploadedFile = form.get("file") as File;
   const urlFile = form.get("url");
 
@@ -23,10 +27,10 @@ async function resolveMediaUpload(
 
       const thumbnail = form.get("thumbnail") as File;
       if (thumbnail.size > 0) {
-        fields.image_url = await uploadImage(thumbnail);
+        fields.content.image_url = await uploadImage(thumbnail);
       }
     } else {
-      fields.image_url = urlFile as string;
+      fields.content.image_url = urlFile as string;
     }
 
     return fields;
@@ -34,7 +38,7 @@ async function resolveMediaUpload(
 
   if (uploadedFile.size > 0) {
     if (uploadedFile.type.split("/")[0] === "image") {
-      fields.image_url = await uploadImage(uploadedFile);
+      fields.content.image_url = await uploadImage(uploadedFile);
     } else if (
       [
         "video/mp4",
@@ -47,11 +51,11 @@ async function resolveMediaUpload(
         "video/mpeg",
       ].includes(uploadedFile.type)
     ) {
-      fields.video_url = await uploadVideo(uploadedFile);
+      fields.content.video_url = await uploadVideo(uploadedFile);
 
       const thumbnail = form.get("thumbnail") as File;
       if (thumbnail.size > 0) {
-        fields.image_url = await uploadImage(thumbnail);
+        fields.content.image_url = await uploadImage(thumbnail);
       }
     }
   } else {

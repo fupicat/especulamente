@@ -1,8 +1,4 @@
-export async function uploadImage(file: File | null) {
-  if (!file) {
-    return null;
-  }
-
+export async function uploadImage(file: File): Promise<string> {
   const headers = new Headers();
   headers.append(
     "Authorization",

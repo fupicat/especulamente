@@ -41,34 +41,30 @@ import { profilePicture } from "@/lib/clientShorthand";
 </aside>
 
 <script>
-  import {
-    loadLoop,
-    loadSample,
-    playLoop,
-    playSample,
-    pauseLoop,
-  } from "@/lib/audio";
+  import { loadSample, playSample, stopSample } from "@/lib/audio";
 
   (async () => {
     const tvOn = await loadSample("/sfx/tv-on.wav");
 
-    const tvStatic = loadLoop("/sfx/tv-static.wav", {
-      volume: 0.5,
-      loop: true,
-    });
+    const tvStatic = await loadSample("/sfx/tv-static.wav");
 
     const projectLinks = document.querySelectorAll<HTMLAnchorElement>(
       ".project-list .project .thumbnail"
     );
 
     projectLinks.forEach((link) => {
+      let loop: AudioBufferSourceNode | null = null;
+
       link.addEventListener("mouseenter", () => {
         playSample(tvOn);
-        playLoop(tvStatic);
+        loop = playSample(tvStatic, {
+          volume: 0.5,
+          loop: true,
+        });
       });
 
       link.addEventListener("mouseleave", () => {
-        pauseLoop(tvStatic);
+        loop = stopSample(loop);
       });
     });
   })();

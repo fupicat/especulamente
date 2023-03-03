@@ -1,7 +1,7 @@
 ---
 import Footer from "@/components/Footer.astro";
 import GlobalStyles from "@/components/GlobalStyles.astro";
-import Header from "@/components/Header.astro";
+import BarraDeCima from "@/components/BarraDeCima.astro";
 import type { ProfileType } from "@/models/Profile";
 
 export interface Props {
@@ -34,7 +34,7 @@ const { title, profile, id } = Astro.props;
     />
   </head>
   <body>
-    <Header profile={profile} />
+    <BarraDeCima profile={profile} />
     <main id={id}>
       <slot />
     </main>

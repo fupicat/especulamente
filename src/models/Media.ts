@@ -1,99 +1,89 @@
 import { server } from "@/lib/supabaseServer";
-import Profile, { ProfileType } from "./Profile";
+import Profile from "./Profile";
+import Project, {
+  BaseProjectCreatable,
+  BaseProjectData,
+  BaseProjectEditable,
+} from "./Project";
 
-export interface MediaType {
-  id: number;
-  created_at: Date;
-  author: ProfileType;
-  image_url: string | null;
-  video_url: string | null;
-  title: string;
-  description: string;
-  tags: string[];
-  nsfw: boolean;
-}
+export type ImageContent = {
+  image_url: string;
+};
+export type ImageData = BaseProjectData<"image", ImageContent>;
+export type ImageCreatable = BaseProjectCreatable<"image", ImageContent>;
+export type ImageEditable = BaseProjectEditable<ImageContent>;
 
-export interface MediaCreatable {
-  id?: number;
-  created_at?: Date;
-  author: string;
-  image_url: string | null;
-  video_url: string | null;
-  title: string;
-  description: string;
-  tags: string[];
-  nsfw: boolean;
-}
+export type VideoContent = {
+  video_url: string;
+};
+export type VideoData = BaseProjectData<"video", VideoContent>;
+export type VideoCreatable = BaseProjectCreatable<"video", VideoContent>;
+export type VideoEditable = BaseProjectEditable<VideoContent>;
 
-export interface MediaEditable {
-  image_url?: string | null;
-  video_url?: string | null;
-  title?: string;
-  description?: string;
-  tags?: string[];
-  nsfw?: boolean;
-}
+export type MediaContent = ImageContent | VideoContent;
+export type MediaData = ImageData | VideoData;
+export type MediaCreatable = ImageCreatable | VideoCreatable;
+export type MediaEditable = ImageEditable | VideoEditable;
 
-export default class Media {
-  static placeholders: MediaType[] = new Array(8)
+export default class Media extends Project {
+  static placeholders: MediaData[] = new Array(8)
     .fill([
       {
         id: 1,
         created_at: new Date(),
         author: Profile.placeholders[0],
-        image_url: "https://i.imgur.com/gdDSa7b.png",
-        video_url: null,
-        title: "Imagem",
-        description: "Descrição da imagem",
-        tags: ["especulativo", "doido"],
-        nsfw: false,
-      },
-      {
-        id: 2,
-        created_at: new Date(),
-        author: Profile.placeholders[0],
-        image_url: null,
-        video_url: "https://i.imgur.com/mHJaHCt.mp4",
-        title: "Vídeo",
-        description: "Descrição do vídeo",
-        tags: ["bfdi", "neon", "fupi"],
-        nsfw: false,
-      },
-      {
-        id: 3,
-        created_at: new Date(),
-        author: Profile.placeholders[0],
-        image_url: "https://i.imgur.com/gdDSa7b.png",
-        video_url: null,
+        type: "image",
+        thumbnail_url: "https://i.imgur.com/gdDSa7b.png",
+        content: {
+          image_url: "https://i.imgur.com/gdDSa7b.png",
+        },
         title: "Imagem",
         description: "Descrição da imagem",
         tags: ["especulativo", "doido"],
         nsfw: true,
       },
-    ])
+      {
+        id: 2,
+        created_at: new Date(),
+        author: Profile.placeholders[0],
+        type: "image",
+        thumbnail_url: "https://i.imgur.com/gdDSa7b.png",
+        content: {
+          image_url: "https://i.imgur.com/gdDSa7b.png",
+        },
+        title: "Imagem",
+        description: "Descrição da imagem",
+        tags: ["especulativo", "doido"],
+        nsfw: true,
+      },
+      {
+        id: 3,
+        created_at: new Date(),
+        author: Profile.placeholders[0],
+        type: "image",
+        thumbnail_url: "https://i.imgur.com/gdDSa7b.png",
+        content: {
+          image_url: "https://i.imgur.com/gdDSa7b.png",
+        },
+        title: "Imagem",
+        description: "Descrição da imagem",
+        tags: ["especulativo", "doido"],
+        nsfw: true,
+      },
+    ] as MediaData[])
     .flat();
 
-  static async get(id?: number | string): Promise<MediaType | null> {
-    if (!server) return this.placeholders.find((m) => id === m.id) || null;
-    if (!id) return null;
-
-    const { data, error } = await server
-      .from("media")
-      .select("*, author (*)")
-      .eq("id", id)
-      .single();
-
-    if (error) throw error;
-
-    return data || null;
+  static async get(id?: number): Promise<MediaData | null> {
+    return (await Project.get(id)) as MediaData;
   }
 
-  static async all(): Promise<MediaType[]> {
+  static async all(): Promise<MediaData[]> {
     if (!server) return this.placeholders;
 
     const { data, error } = await server
-      .from("media")
+      .from("projects")
       .select("*, author (*)")
+      .or("type.eq.image,type.eq.video")
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -101,45 +91,15 @@ export default class Media {
     return data;
   }
 
-  static async put(
-    id?: number | string,
-    fields?: MediaEditable
-  ): Promise<MediaType> {
-    if (!server) return this.placeholders[0];
-    if (!id || !fields) throw { error: { message: "Essa mídia não existe." } };
-
-    const { data, error } = await server
-      .from("media")
-      .update(fields)
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    return data;
+  static async put(id?: number, fields?: MediaEditable): Promise<MediaData> {
+    return (await Project.put(id, fields)) as MediaData;
   }
 
-  static async post(fields: MediaCreatable): Promise<MediaType> {
-    if (!server) return this.placeholders[0];
-
-    const { data, error } = await server
-      .from("media")
-      .insert(fields)
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    return data;
+  static async post(fields: MediaCreatable): Promise<MediaData> {
+    return (await Project.post(fields)) as MediaData;
   }
 
-  static async del(id?: number | string) {
-    if (!server) return;
-    if (!id) throw { error: { message: "Essa mídia não existe." } };
-
-    const { error } = await server.from("media").delete().eq("id", id);
-
-    if (error) throw error;
+  static async del(id?: number) {
+    await Project.del(id);
   }
 }

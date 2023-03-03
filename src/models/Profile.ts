@@ -2,24 +2,24 @@ import { getCookie } from "@/lib/serverShorthand";
 import { getUser, server } from "@/lib/supabaseServer";
 import type { AstroGlobal } from "astro";
 
-export interface ProfileType {
+export type ProfileData = {
   username: string;
   id: string;
   nickname: string;
   avatar_url: string | null;
   bio: string;
   created_at: Date;
-}
+};
 
-export interface ProfileEditable {
+export type ProfileEditable = {
   username?: string | null;
   nickname?: string | null;
   avatar_url?: string | null;
   bio?: string;
-}
+};
 
 export default class Profile {
-  static placeholders: ProfileType[] = new Array(20).fill({
+  static placeholders: ProfileData[] = new Array(20).fill({
     id: "00000000-0000-0000-0000-0000000000",
     username: "placeholder",
     nickname: "Placeholder",
@@ -34,7 +34,7 @@ export default class Profile {
   }: {
     username?: string;
     id?: string;
-  }): Promise<ProfileType | null> {
+  }): Promise<ProfileData | null> {
     if (!server) {
       if (username)
         return this.placeholders.find((p) => p.username === username) || null;
@@ -69,7 +69,7 @@ export default class Profile {
     return null;
   }
 
-  static async all(): Promise<ProfileType[]> {
+  static async all(): Promise<ProfileData[]> {
     if (!server) return this.placeholders;
 
     const { data, error } = await server.from("profiles").select("*");
@@ -79,7 +79,7 @@ export default class Profile {
     return data;
   }
 
-  static async put(id: string, fields: ProfileEditable): Promise<ProfileType> {
+  static async put(id: string, fields: ProfileEditable): Promise<ProfileData> {
     if (!server) return this.placeholders[0];
 
     const { data, error } = await server
@@ -102,7 +102,7 @@ export default class Profile {
    */
   static async current(
     req: Readonly<AstroGlobal<Record<string, any>>> | Request
-  ): Promise<ProfileType | null> {
+  ): Promise<ProfileData | null> {
     if (!server) return null;
     const user =
       req instanceof Request
