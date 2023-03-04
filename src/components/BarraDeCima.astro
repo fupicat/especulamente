@@ -8,7 +8,7 @@ export interface Props {
 const { profile } = Astro.props;
 ---
 
-<header>
+<header id="barra-de-cima">
   <div class="top">
     <div class="container">
       <h1>especulamente.com.br</h1>
@@ -173,8 +173,8 @@ const { profile } = Astro.props;
   })();
 </script>
 
-<style lang="scss">
-  header {
+<style lang="scss" is:global>
+  header#barra-de-cima {
     box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.7);
 
     .top {

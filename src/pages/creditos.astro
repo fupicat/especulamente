@@ -5,7 +5,7 @@ import Profile from "@/models/Profile";
 const sessionProfile = await Profile.current(Astro);
 ---
 
-<Layout title="Créditos" profile={sessionProfile}>
+<Layout title="Créditos" profile={sessionProfile} id="creditos">
   <div class="container">
     <h1 class="hooge">Créditos</h1>
     <article>
@@ -16,15 +16,17 @@ const sessionProfile = await Profile.current(Astro);
   </div>
 </Layout>
 
-<style lang="scss">
-  .container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+<style lang="scss" is:global>
+  #creditos {
+    .container {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
 
-    article {
-      margin-top: 1rem;
+      article {
+        margin-top: 1rem;
 
-      min-height: 16rem;
+        min-height: 16rem;
+      }
     }
   }
 </style>

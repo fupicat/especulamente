@@ -1,12 +1,12 @@
 ---
-import Footer from "@/components/Footer.astro";
 import GlobalStyles from "@/components/GlobalStyles.astro";
 import BarraDeCima from "@/components/BarraDeCima.astro";
-import type { ProfileType } from "@/models/Profile";
+import type { ProfileData } from "@/models/Profile";
+import BarraDeBaixo from "@/components/BarraDeBaixo.astro";
 
 export interface Props {
   title?: string;
-  profile: ProfileType | null;
+  profile: ProfileData | null;
   id?: string;
 }
 
@@ -38,7 +38,7 @@ const { title, profile, id } = Astro.props;
     <main id={id}>
       <slot />
     </main>
-    <Footer />
+    <BarraDeBaixo />
   </body>
 </html>
 
@@ -87,8 +87,8 @@ const { title, profile, id } = Astro.props;
 
 <GlobalStyles />
 
-<style lang="scss">
-  main {
+<style lang="scss" is:global>
+  body > main {
     background: rgba(255, 255, 255, 0.3);
     box-shadow: 0px 0px 14px 2px #000000;
 

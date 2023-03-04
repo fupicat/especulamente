@@ -220,22 +220,22 @@
   });
 </script>
 
-<style lang="scss">
-  #cramunha {
+<style lang="scss" is:global>
+  svg#cramunha {
     * {
       pointer-events: none;
     }
-  }
 
-  #cramunha-starburst-wrapper {
-    animation: rotate-360 40s linear infinite;
+    g#cramunha-starburst-wrapper {
+      animation: rotate-360 40s linear infinite;
 
-    @keyframes rotate-360 {
-      from {
-        rotate: 0deg;
-      }
-      to {
-        rotate: 360deg;
+      @keyframes rotate-360 {
+        from {
+          rotate: 0deg;
+        }
+        to {
+          rotate: 360deg;
+        }
       }
     }
   }
