@@ -10,39 +10,51 @@ const sessionProfile = await Profile.current(Astro);
 <Layout profile={sessionProfile} id="home">
   <div class="container">
     <Cramunhao />
-    <BarraDoLado />
+    <aside>
+      <div id="marquee" class="arial">
+        <p>Frases passando aqui estilo marquee blablabla</p>
+      </div>
+      <BarraDoLado />
+    </aside>
   </div>
 </Layout>
 
 <script>
-  // const musicas = [
-  //   "/music/last_passo.mp3",
-  //   "/music/jogo_dificil.mp3",
-  //   "/music/sonho_escape.mp3",
-  // ];
+  import { loadSample, playSample } from "@/lib/audio";
+  import Marquee from "@/lib/marquee";
 
-  // function shuffle(array: Array<any>) {
-  //   let currentIndex = array.length,
-  //     randomIndex;
+  const musicas = [
+    "/music/last_passo.mp3",
+    "/music/jogo_dificil.mp3",
+    "/music/sonho_escape.mp3",
+  ];
 
-  //   while (currentIndex != 0) {
-  //     randomIndex = Math.floor(Math.random() * currentIndex);
-  //     currentIndex--;
+  function shuffle(array: Array<any>) {
+    let currentIndex = array.length,
+      randomIndex;
 
-  //     [array[currentIndex], array[randomIndex]] = [
-  //       array[randomIndex],
-  //       array[currentIndex],
-  //     ];
-  //   }
+    while (currentIndex != 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
 
-  //   return array;
-  // }
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex],
+        array[currentIndex],
+      ];
+    }
 
-  // shuffle(musicas);
+    return array;
+  }
 
-  // var audio = new Audio(musicas[0]);
-  // audio.loop = true;
-  // audio.play();
+  shuffle(musicas);
+
+  (async () => {
+    const audio = await loadSample(musicas[0]);
+
+    playSample(audio, { loop: true, volume: 0.7 });
+  })();
+
+  Marquee("#marquee", 0.4);
 </script>
 
 <style lang="scss" is:global>
@@ -51,8 +63,29 @@ const sessionProfile = await Profile.current(Astro);
       display: flex;
       justify-content: space-between;
 
-      #barra-do-lado {
+      > aside {
         margin-top: 19px;
+
+        #marquee {
+          width: 253px;
+          overflow: hidden;
+          display: flex;
+
+          p {
+            font-style: normal;
+            font-weight: 400;
+            font-size: 12px;
+            line-height: 14px;
+
+            color: #000000;
+
+            white-space: nowrap;
+          }
+        }
+
+        #barra-do-lado {
+          margin-top: 6px;
+        }
       }
     }
   }
