@@ -3,6 +3,7 @@ import { profilePicture } from "@/lib/clientShorthand";
 ---
 
 <aside id="barra-do-lado">
+  <img class="splat" src="/img/sprites/barra-do-lado-splat.png" alt="" />
   <div class="top"></div>
   <div class="bottom">
     <img src="/img/sprites/barra-do-lado.png" alt="Barra do lado" />
@@ -36,6 +37,14 @@ import { profilePicture } from "@/lib/clientShorthand";
           ))
         }
       </div>
+      <a href="/projects" class="link">
+        <p class="arial">&lt;&lt; Ver novidades anteriores</p>
+      </a>
+      <div class="header"><p class="hooge">anuncios fake lmao</p></div>
+      <a href="/404" class="ad">
+        <img src="/img/detector-de-viciado-em-chad.png" alt="" />
+        <img src="/img/ads/neon-mania.png" alt="Neon Mania" />
+      </a>
     </div>
   </div>
 </aside>
@@ -75,6 +84,23 @@ import { profilePicture } from "@/lib/clientShorthand";
     display: flex;
     flex-direction: column;
     max-width: 15.875rem;
+    position: relative;
+
+    .splat {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+
+      pointer-events: none;
+
+      object-fit: none;
+      object-position: top right;
+
+      mix-blend-mode: overlay;
+      opacity: 0.3;
+    }
 
     .top {
       height: 8px;
@@ -113,8 +139,13 @@ import { profilePicture } from "@/lib/clientShorthand";
         }
 
         .header {
+          margin-top: 24px;
           background: rgb(255, 255, 255, 0.2);
           border: 2px solid rgb(0, 0, 0, 0.2);
+
+          &:first-of-type {
+            margin-top: 0;
+          }
 
           p {
             font-style: normal;
@@ -131,6 +162,7 @@ import { profilePicture } from "@/lib/clientShorthand";
           margin-top: 9px;
           display: flex;
           flex-direction: column;
+          gap: 4px;
 
           .project {
             display: flex;
@@ -140,6 +172,7 @@ import { profilePicture } from "@/lib/clientShorthand";
             .thumbnail {
               position: relative;
               width: 4rem;
+              height: 3rem;
 
               &:hover {
                 .static,
@@ -221,6 +254,40 @@ import { profilePicture } from "@/lib/clientShorthand";
                 }
               }
             }
+          }
+        }
+
+        .link {
+          margin-top: 10px;
+          display: block;
+
+          font-style: normal;
+          font-weight: 400;
+          font-size: 0.5625rem;
+          line-height: 0.625rem;
+
+          color: rgba(255, 255, 255, 0.6);
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+
+        .ad {
+          display: block;
+          margin-top: 9px;
+          position: relative;
+
+          width: 232px;
+          height: 174px;
+          background-color: rgba(166, 166, 166, 0.2);
+
+          img {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
           }
         }
       }
