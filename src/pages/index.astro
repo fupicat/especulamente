@@ -3,27 +3,33 @@ import BarraDoLado from "@/components/BarraDoLado.astro";
 import Cramunhao from "@/components/home/Cramunhao.astro";
 import Layout from "@/layouts/Layout.astro";
 import Profile from "@/models/Profile";
+import * as Quotes from "@/content/quotes.md";
 
 const sessionProfile = await Profile.current(Astro);
+
+const quotes = Quotes.rawContent()
+  .split("\n")
+  .sort((a, b) => 0.5 - Math.random())
+  .join('<span style="color: #5656ff"> ⬦ </span>');
 ---
 
 <Layout profile={sessionProfile} id="home">
   <div class="container">
     <Cramunhao />
     <aside>
-      <div id="marquee" class="arial">
-        <p>Frases passando aqui estilo marquee blablabla</p>
-      </div>
+      <marquee
+        class="arial"
+        scrolldelay="30"
+        truespeed
+        scrollamount="1"
+        onmouseenter="this.scrollAmount = 0"
+        onmouseleave="this.scrollAmount = 1"
+        set:html={quotes}
+      />
       <BarraDoLado />
     </aside>
   </div>
 </Layout>
-
-<script>
-  import Marquee from "@/lib/marquee";
-
-  Marquee("#marquee", 0.4);
-</script>
 
 <style lang="scss" is:global>
   #home {
@@ -34,21 +40,18 @@ const sessionProfile = await Profile.current(Astro);
       > aside {
         margin-top: 19px;
 
-        #marquee {
+        marquee {
           width: 253px;
           overflow: hidden;
-          display: flex;
 
-          p {
-            font-style: normal;
-            font-weight: 400;
-            font-size: 12px;
-            line-height: 14px;
+          font-style: normal;
+          font-weight: 400;
+          font-size: 12px;
+          line-height: 14px;
 
-            color: #000000;
+          color: #000000;
 
-            white-space: nowrap;
-          }
+          white-space: nowrap;
         }
 
         #barra-do-lado {

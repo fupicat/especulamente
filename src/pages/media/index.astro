@@ -13,12 +13,12 @@ const media = await Media.all();
   <h1>Mídia</h1>
   {
     media?.map((item) => (
-      <a href={`/media/${item.id}`} class="profile">
+      <a href={`/media/${item.id}`} class="media">
         <img
           src={
             item.nsfw
               ? "/img/crucificamente.png"
-              : profilePicture(item.image_url)
+              : profilePicture(item.thumbnail_url)
           }
           alt={item.title}
           width="200"

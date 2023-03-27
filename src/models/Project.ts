@@ -69,6 +69,57 @@ export default class Project {
     return data;
   }
 
+  static async search({
+    query = "",
+    page = 0,
+    types = [],
+    tags = [],
+    authors = [],
+    nsfw = true,
+    oldest = false,
+  }: {
+    query?: string;
+    page?: number;
+    types?: string[];
+    tags?: string[];
+    authors?: string[];
+    nsfw?: boolean;
+    oldest?: boolean;
+  }): Promise<{ data: ProjectData[]; pageCount: number }> {
+    if (!server)
+      return { data: this.placeholders, pageCount: this.placeholders.length };
+
+    let selection = server
+      .from("projects")
+      .select("*, author!inner (*)", {
+        count: "exact",
+      })
+      .order("created_at", {
+        ascending: oldest,
+      });
+
+    if (query.length > 0)
+      selection = selection.or(
+        `title.fts.${encodeURIComponent(
+          query
+        )}, description.fts.${encodeURIComponent(query)}`
+      );
+    if (types.length > 0) selection = selection.in("type", types);
+    if (tags.length > 0) selection = selection.overlaps("tags", tags);
+    if (authors.length > 0)
+      selection = selection.in("author.username", authors);
+
+    if (!nsfw) selection = selection.eq("nsfw", false);
+
+    const pageCount = Math.ceil((await selection).count! / 10.0);
+    if (page >= pageCount) return { data: [], pageCount };
+
+    const { data, error } = await selection.range(page * 10, page * 10 + 10);
+    if (error) throw error;
+
+    return { data, pageCount };
+  }
+
   static async put(
     id?: number,
     fields?: ProjectEditable
