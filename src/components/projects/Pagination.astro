@@ -1,0 +1,129 @@
+---
+interface Props {
+  currentPage: number;
+  pageCount: number;
+  url: URL;
+}
+
+const { currentPage, pageCount, url } = Astro.props;
+
+function generatePageNumbers(currentPage: number, lastPage: number) {
+  const maxVisiblePages = 9;
+  const halfVisiblePages = Math.floor(maxVisiblePages / 2);
+
+  if (lastPage < maxVisiblePages) {
+    // If there's last pages than the max visible pages
+    return {
+      numbers: Array.from({ length: lastPage }, (_, i) => i + 1),
+    };
+  } else if (currentPage <= halfVisiblePages) {
+    // If current page is close to the start
+    return {
+      showLast: true,
+      numbers: Array.from({ length: maxVisiblePages }, (_, i) => i + 1).slice(
+        0,
+        lastPage
+      ),
+    };
+  } else if (currentPage >= lastPage - halfVisiblePages) {
+    // If current page is close to the end
+    return {
+      showFirst: true,
+      numbers: Array.from(
+        { length: maxVisiblePages },
+        (_, i) => lastPage - maxVisiblePages + i + 1
+      ),
+    };
+  } else {
+    // If current page is in the middle
+    const startPage = currentPage - halfVisiblePages;
+    return {
+      showFirst: true,
+      showLast: true,
+      numbers: Array.from({ length: maxVisiblePages }, (_, i) => startPage + i),
+    };
+  }
+}
+
+const firstPageURL = ((url: URL): string | null => {
+  url.searchParams.set("page", "1");
+  return url.toString();
+})(url);
+
+const prevPageURL = ((url: URL): string | null => {
+  if (currentPage === 1) {
+    return null;
+  }
+  url.searchParams.set("page", `${currentPage - 1}`);
+  return url.toString();
+})(url);
+
+const lastPageURL = ((url: URL): string | null => {
+  url.searchParams.set("page", `${pageCount}`);
+  return url.toString();
+})(url);
+
+const nextPageURL = ((url: URL): string | null => {
+  if (currentPage === pageCount) {
+    return null;
+  }
+  url.searchParams.set("page", `${currentPage + 1}`);
+  return url.toString();
+})(url);
+
+const pageNumbers = generatePageNumbers(currentPage, pageCount);
+---
+
+<div class="pagination arial underline">
+  {
+    prevPageURL && (
+      <span>
+        <a href={prevPageURL}>&lt;</a> ~
+      </span>
+    )
+  }{
+    pageNumbers.showFirst && (
+      <span>
+        <a href={firstPageURL}>1</a> ...
+      </span>
+    )
+  }{
+    pageNumbers.numbers.map((number) => (
+      <span>
+        {number === currentPage ? (
+          <strong>{number}</strong>
+        ) : (
+          <a href={`/media?page=${number}`}>{number}</a>
+        )}
+      </span>
+    ))
+  }{
+    pageNumbers.showLast && (
+      <span>
+        ... <a href={lastPageURL}>{pageCount}</a>
+      </span>
+    )
+  }{
+    nextPageURL && (
+      <span>
+        ~ <a href={nextPageURL}>&gt;</a>
+      </span>
+    )
+  }
+</div>
+
+<style lang="scss" is:global>
+  .pagination {
+    color: white;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+
+    text-align: center;
+
+    a {
+      color: #6cb2ff;
+    }
+  }
+</style>

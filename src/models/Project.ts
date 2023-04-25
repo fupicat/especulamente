@@ -77,6 +77,7 @@ export default class Project {
     authors = [],
     nsfw = true,
     oldest = false,
+    perPage = 10,
   }: {
     query?: string;
     page?: number;
@@ -85,9 +86,12 @@ export default class Project {
     authors?: string[];
     nsfw?: boolean;
     oldest?: boolean;
+    perPage?: number;
   }): Promise<{ data: ProjectData[]; pageCount: number }> {
     if (!server)
       return { data: this.placeholders, pageCount: this.placeholders.length };
+
+    page = page - 1;
 
     let selection = server
       .from("projects")
@@ -111,10 +115,13 @@ export default class Project {
 
     if (!nsfw) selection = selection.eq("nsfw", false);
 
-    const pageCount = Math.ceil((await selection).count! / 10.0);
+    const pageCount = Math.ceil((await selection).count! / perPage);
     if (page >= pageCount) return { data: [], pageCount };
 
-    const { data, error } = await selection.range(page * 10, page * 10 + 10);
+    const { data, error } = await selection.range(
+      page * perPage,
+      page * perPage + perPage - 1
+    );
     if (error) throw error;
 
     return { data, pageCount };
