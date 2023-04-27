@@ -1,5 +1,6 @@
 ---
 import BarraDoLado from "@/components/BarraDoLado.astro";
+import BuscaAvancada from "@/components/projects/BuscaAvancada.astro";
 import Pagination from "@/components/projects/Pagination.astro";
 import Layout from "@/layouts/Layout.astro";
 import { profilePicture } from "@/lib/clientShorthand";
@@ -74,7 +75,9 @@ const pageCount = media.pageCount;
       </div>
       <div class="color" style="background-color: #00BD2A"></div>
     </div>
-    <BarraDoLado />
+    <BarraDoLado>
+      <BuscaAvancada />
+    </BarraDoLado>
   </div>
 </Layout>
 
@@ -87,7 +90,7 @@ const pageCount = media.pageCount;
       gap: 24px;
       align-items: flex-start;
 
-      .box {
+      > .box {
         width: 100%;
         display: flex;
         flex-direction: column;

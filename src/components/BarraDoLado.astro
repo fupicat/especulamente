@@ -8,7 +8,8 @@ import { profilePicture } from "@/lib/clientShorthand";
   <div class="bottom">
     <img src="/img/sprites/barra-do-lado.png" alt="Barra do lado" />
     <div class="box">
-      <div class="header"><p class="hooge">novidades</p></div>
+      <slot />
+      <div class="header"><p>novidades</p></div>
       <div class="project-list">
         {
           [0, 0, 0, 0, 0].map((project) => (
@@ -40,7 +41,7 @@ import { profilePicture } from "@/lib/clientShorthand";
       <a href="/projects" class="link">
         <p class="arial">&lt;&lt; Ver novidades anteriores</p>
       </a>
-      <div class="header"><p class="hooge">anuncios fake lmao</p></div>
+      <div class="header"><p>anuncios fake lmao</p></div>
       <a href="/404" class="ad">
         <img src="/img/detector-de-viciado-em-chad.png" alt="" />
         <img src="/img/ads/neon-mania.png" alt="Neon Mania" />
@@ -113,9 +114,14 @@ import { profilePicture } from "@/lib/clientShorthand";
       image-rendering: pixelated;
       background: url("/img/sprites/cramunhao-grid.png");
 
+      > * {
+        image-rendering: auto;
+      }
+
       > img {
         margin-left: 1rem;
         margin-top: 0.25rem;
+        image-rendering: pixelated;
       }
 
       .box {
@@ -149,6 +155,7 @@ import { profilePicture } from "@/lib/clientShorthand";
           }
 
           p {
+            font-family: "Hooge", "Courier New", Courier, monospace;
             font-style: normal;
             font-weight: 400;
             font-size: 0.875rem;

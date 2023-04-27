@@ -11,6 +11,7 @@ export const get: APIRoute = async ({ url }) => {
       .map((tag) => decodeURIComponent(tag)) || [];
   const authors = url.searchParams.get("authors")?.split(",") || [];
   const sfw = url.searchParams.has("sfw");
+  const oldest = url.searchParams.has("oldest");
   const perPage = Number(url.searchParams.get("perPage") || 10);
 
   const page = Number(url.searchParams.get("page")) || 0;
@@ -24,6 +25,7 @@ export const get: APIRoute = async ({ url }) => {
         tags,
         authors,
         nsfw: !sfw,
+        oldest,
         perPage,
       })
     ),

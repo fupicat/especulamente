@@ -1,0 +1,194 @@
+---
+import "7.css/dist/7.scoped.css";
+import Profile from "@/models/Profile";
+
+const profiles = await Profile.all();
+---
+
+<div class="header"><p>busca avançada</p></div>
+<form id="busca-avancada" class="filters win7">
+  <div class="filter">
+    <label for="filter-search" class="arial">Busca</label>
+    <input
+      id="filter-search"
+      placeholder="O que você quer..."
+      type="search"
+      name="q"
+    />
+  </div>
+  <div class="filter">
+    <label>Tipos de projeto</label>
+    <div
+      class="types"
+      title="Deixe tudo desmarcado para pesquisar por todos os tipos."
+    >
+      <div class="field-row">
+        <input
+          type="checkbox"
+          id="filter-type-image"
+          name="image"
+          checked={Astro.url.pathname === "/media"}
+        />
+        <label for="filter-type-image">Imagens</label>
+      </div>
+      <div class="field-row">
+        <input
+          type="checkbox"
+          id="filter-type-video"
+          name="video"
+          checked={Astro.url.pathname === "/media"}
+        />
+        <label for="filter-type-video">Vídeos</label>
+      </div>
+      <div class="field-row">
+        <input type="checkbox" id="filter-type-game" name="game" />
+        <label for="filter-type-game">Jogos</label>
+      </div>
+      <div class="field-row">
+        <input type="checkbox" id="filter-type-document" name="document" />
+        <label for="filter-type-document">Documentos</label>
+      </div>
+      <div class="field-row">
+        <input type="checkbox" id="filter-type-blog" name="blog" />
+        <label for="filter-type-blog">Blogs</label>
+      </div>
+      <div class="field-row">
+        <input type="checkbox" id="filter-type-page" name="page" />
+        <label for="filter-type-page">Páginas</label>
+      </div>
+    </div>
+  </div>
+  <div class="filter">
+    <label for="filter-tags">Tags</label>
+    <input
+      type="text"
+      id="filter-tags"
+      name="tags"
+      placeholder="tag1, tag2, tag3..."
+      title="Tags reparadas por vírgula"
+    />
+  </div>
+  <div class="filter">
+    <label for="filter-author">Autores</label>
+    <select
+      id="filter-author"
+      name="authors"
+      multiple
+      title="Segure CTRL para selecionar mais de um."
+    >
+      {
+        profiles.map((profile) => (
+          <option value={profile.username}>{profile.nickname}</option>
+        ))
+      }
+    </select>
+  </div>
+  <div class="filter">
+    <div class="field-row">
+      <input type="checkbox" id="filter-nsfw" name="nsfw" checked />
+      <label for="filter-nsfw">Mostrar crucificamente (NSFW)</label>
+    </div>
+  </div>
+  <div class="filter">
+    <label for="filter-order">Ordenar por</label>
+    <select id="filter-order" name="order">
+      <option value="recent">Mais recentes</option>
+      <option value="oldest">Mais antigos</option>
+    </select>
+  </div>
+  <button type="submit" class="default">Buscar</button>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("#busca-avancada")!;
+
+  form
+    .querySelector<HTMLButtonElement>("button[type='submit']")!
+    .addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const searchParams = new URLSearchParams();
+
+      const q = form.querySelector<HTMLInputElement>("input[name='q']")!.value;
+      if (q) searchParams.set("q", q);
+
+      const types = Array.from(
+        form.querySelectorAll<HTMLInputElement>(".types input[type='checkbox']")
+      )
+        .filter((input) => input.checked)
+        .map((input) => input.name);
+      if (types.length > 0) searchParams.set("types", types.join(","));
+
+      const tags =
+        form.querySelector<HTMLInputElement>("input[name='tags']")!.value;
+      if (tags)
+        searchParams.set(
+          "tags",
+          tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .join(",")
+        );
+
+      const authors = Array.from(
+        form.querySelector<HTMLSelectElement>("select[name='authors']")!
+          .selectedOptions
+      ).map((option) => option.value);
+      if (authors.length > 0) searchParams.set("authors", authors.join(","));
+
+      const sfw =
+        form.querySelector<HTMLInputElement>("input[name='nsfw']")!.checked;
+      if (!sfw) searchParams.set("sfw", "true");
+
+      const oldest =
+        form.querySelector<HTMLSelectElement>("select[name='order']")!.value ===
+        "oldest";
+      if (oldest) searchParams.set("oldest", "true");
+
+      window.location.href = `/projects?${searchParams.toString()}`;
+    });
+</script>
+
+<style lang="scss" is:global>
+  #busca-avancada.filters {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+
+    .filter {
+      width: 100%;
+
+      label {
+        font-style: normal;
+        font-weight: 400;
+        font-size: 11px;
+        line-height: 12px;
+
+        color: #ffffff;
+      }
+
+      .types {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+
+        .field-row {
+          margin: 0;
+        }
+      }
+
+      > label {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      input[type="search"],
+      input[type="text"],
+      select {
+        width: 100%;
+      }
+    }
+  }
+</style>
