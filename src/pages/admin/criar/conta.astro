@@ -3,8 +3,6 @@ import Layout from "@/layouts/Layout.astro";
 import Profile from "@/models/Profile";
 
 const sessionProfile = await Profile.current(Astro);
-
-if (!sessionProfile) return Astro.redirect("/403");
 ---
 
 <Layout title="Criando conta" profile={sessionProfile}>
@@ -50,7 +48,7 @@ if (!sessionProfile) return Astro.redirect("/403");
         }
 
         if (usernameExists.data.length > 0) {
-          alert("Erro!! Nome de usuário já existe!! Cadê a CRIATIVIDADE??");
+          alert("Erro!! Nome de usuário já existe!! Cadê a ORIGINALIDADE??");
           return;
         }
 
