@@ -76,7 +76,7 @@ export default class Profile {
 
     if (error) throw error;
 
-    return data;
+    return data as ProfileData[];
   }
 
   static async put(id: string, fields: ProfileEditable): Promise<ProfileData> {
