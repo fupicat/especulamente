@@ -10,58 +10,63 @@ import Project from "@/models/Project";
 const sessionProfile = await Profile.current(Astro);
 
 const currentPage = Number(Astro.url.searchParams.get("page") ?? 1);
-const media = await Project.search({
-  types: ["image", "video"],
+const projects = await Project.search({
+  query: Astro.url.searchParams.get("q") ?? "",
+  types: Astro.url.searchParams.get("types")?.split(",") || [],
+  tags: Astro.url.searchParams.get("tags")?.split(",") || [],
   perPage: 9,
   page: currentPage,
 });
 
-const pageCount = media.pageCount;
+const pageCount = projects.pageCount;
 ---
 
-<Layout id="media" title="Mídia" profile={sessionProfile}>
+<Layout id="projects" title="Projetos" profile={sessionProfile}>
   <div class="container">
     <div class="box">
       <div class="top"></div>
       <div class="bottom">
         <div class="title-bar">
-          <img src="/img/sprites/midia-grande.png" alt="Mídia" />
-          <h2 class="hooge">&gt; MÍDIA</h2>
+          <img src="/img/sprites/projetos-grande.png" alt="Mídia" />
+          <h2 class="hooge">&gt; PROJETOS</h2>
         </div>
         <div class="inset">
-          <div class="grid">
+          <div class="list">
             {
-              media.data?.map((project) => (
-                <div
-                  class="media"
-                  style={`background-image: url("${
-                    project.nsfw
-                      ? "/img/crucificamente.png"
-                      : profilePicture(project.thumbnail_url)
-                  }")`}
-                >
-                  <div class="overlay">
-                    <a href={`/projects/${project.id}`} class="project-link" />
-                    <p class="title arial">{project.title}</p>
-                    <a href={`/users/${project.author.username}`} class="user">
+              projects.data?.map((project) => (
+                <div class="project">
+                  <a class="project-link" href={`/projects/${project.id}`}>
+                    <img
+                      src={profilePicture(project.thumbnail_url)}
+                      alt={project.title}
+                    />
+                    <div class="info">
+                      <h3 class="arial">{project.title}</h3>
+                      <p class="arial">{project.type}</p>
+                      {project.tags && (
+                        <p class="arial">Tags: {project.tags?.join(", ")}</p>
+                      )}
+                    </div>
+                  </a>
+                  <a
+                    class="profile-link"
+                    href={`/users/${project.author.username}`}
+                  >
+                    <div class="info">
+                      <p class="nickname arial">{project.author.nickname}</p>
+                      <p class="date">
+                        {new Date(project.created_at).toLocaleDateString(
+                          "pt-BR"
+                        )}
+                      </p>
+                    </div>
+                    <div class="avatar">
                       <img
                         src={profilePicture(project.author.avatar_url)}
-                        alt={project.author.nickname}
+                        alt={`Foto de perfil de ${project.author.nickname}`}
                       />
-                      <div class="info">
-                        <p class="time">
-                          {new Date(project.created_at).toLocaleString("pt-BR")}
-                        </p>
-                        <p class="nickname arial">fupicat, o legal</p>
-                      </div>
-                    </a>
-                  </div>
-                  {project.type.includes("video") && (
-                    <>
-                      <img class="play-gray" src="/img/sprites/play-gray.svg" />
-                      <img class="play-blue" src="/img/sprites/play-blue.svg" />
-                    </>
-                  )}
+                    </div>
+                  </a>
                 </div>
               ))
             }
@@ -73,7 +78,6 @@ const pageCount = media.pageCount;
           />
         </div>
       </div>
-      <div class="color" style="background-color: #00BD2A"></div>
     </div>
     <BarraDoLado>
       <BuscaAvancada />
@@ -82,7 +86,7 @@ const pageCount = media.pageCount;
 </Layout>
 
 <style lang="scss" is:global>
-  #media {
+  #projects {
     .container {
       padding-top: 36px;
       display: flex;
@@ -165,131 +169,100 @@ const pageCount = media.pageCount;
             flex-direction: column;
             align-items: center;
 
-            .grid {
+            .list {
               width: 100%;
-              display: grid;
-              gap: 10px;
-              grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+              display: flex;
+              gap: 0px;
+              flex-direction: column;
               padding: 10px;
 
-              .media {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-
-                aspect-ratio: 217 / 163;
-
-                background-size: cover;
-                background-position: center;
+              .project {
                 image-rendering: auto;
+                display: flex;
+                justify-content: space-between;
+                gap: 32px;
+                background: linear-gradient(
+                  180deg,
+                  rgba(255, 255, 255, 0.5) 0%,
+                  rgba(205, 205, 205, 0.5) 10%,
+                  rgba(177, 177, 177, 0.5) 100%
+                );
 
-                position: relative;
-
-                &:hover {
-                  .overlay {
-                    opacity: 1;
-
-                    .title {
-                      transform: translateY(0);
-                    }
-
-                    .user {
-                      transform: translateY(0);
-                    }
-                  }
-                }
-
-                .overlay {
-                  opacity: 0;
-                  position: absolute;
-                  top: 0;
-                  right: 0;
-                  bottom: 0;
-                  left: 0;
-                  background-color: rgba(0, 0, 0, 0.7);
-                  overflow: hidden;
-
+                a {
                   display: flex;
-                  flex-direction: column;
-                  justify-content: space-between;
-                  padding: 6px;
 
-                  transition: opacity 0.1s;
-
-                  .project-link {
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    bottom: 0;
-                    left: 0;
-                    display: block;
-                  }
-
-                  .title {
-                    font-style: normal;
-                    font-weight: 700;
-                    font-size: 14px;
-                    line-height: 16px;
-                    text-align: center;
-
-                    color: #ffffff;
-
-                    transform: translateY(-100%);
-                    transition: transform 0.2s
-                      cubic-bezier(0.33, 1.57, 0.62, 0.96);
-                  }
-
-                  .user {
-                    display: flex;
-                    gap: 6px;
-                    align-items: flex-end;
-                    width: fit-content;
-
-                    transform: translateY(100%);
-                    transition: transform 0.2s
-                      cubic-bezier(0.33, 1.57, 0.62, 0.96);
+                  &.project-link {
+                    width: 100%;
 
                     img {
-                      width: 32px;
-                      height: 32px;
+                      width: 76px;
+                      height: 76px;
+                      object-fit: cover;
+                      object-position: center;
                     }
 
                     .info {
-                      .time {
-                        font-style: normal;
-                        font-weight: 400;
-                        font-size: 0.625rem;
-                        line-height: 0.6875rem;
+                      padding: 8px;
+                      color: white;
+                      font-size: 12px;
 
-                        color: rgba(255, 255, 255, 0.4);
+                      h3 {
+                        font-weight: bold;
+                        font-size: 16px;
                       }
 
-                      .nickname {
-                        font-style: normal;
-                        font-weight: 700;
-                        font-size: 12px;
-                        line-height: 14px;
-
-                        color: #ffffff;
+                      p {
+                        opacity: 0.5;
                       }
                     }
                   }
-                }
 
-                > img {
-                  pointer-events: none;
-                }
+                  &.profile-link {
+                    background-color: #0000004d;
 
-                .play-blue {
-                  display: none;
-                }
+                    &:hover {
+                      .info {
+                        width: 112px;
+                        padding-left: 8px;
+                      }
+                    }
 
-                &:hover {
-                  .play-gray {
-                    display: none;
-                  }
-                  .play-blue {
-                    display: unset;
+                    .info {
+                      padding: 8px;
+                      padding-right: 0;
+                      color: white;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: flex-end;
+                      justify-content: end;
+
+                      width: 0px;
+                      padding-left: 0;
+                      overflow: hidden;
+
+                      transition: width 0.1s ease-out,
+                        padding-left 0.1s ease-out;
+
+                      .nickname {
+                        font-weight: bold;
+                      }
+
+                      .date {
+                        opacity: 0.5;
+                        font-size: 12px;
+                      }
+                    }
+
+                    .avatar {
+                      width: 76px;
+                      height: 76px;
+                      padding: 8px;
+
+                      img {
+                        width: 100%;
+                        height: 100%;
+                      }
+                    }
                   }
                 }
               }

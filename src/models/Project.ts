@@ -3,7 +3,7 @@ import type { ProfileData } from "./Profile";
 
 export type BaseProjectData<Type, Content> = {
   id: number;
-  created_at: Date;
+  created_at: string;
   author: ProfileData;
   type: Type;
   title: string;
@@ -53,7 +53,7 @@ export default class Project {
 
     if (error) throw error;
 
-    return data || null;
+    return (data as ProjectData) || null;
   }
 
   static async all(): Promise<ProjectData[]> {
@@ -66,7 +66,7 @@ export default class Project {
 
     if (error) throw error;
 
-    return data;
+    return data as ProjectData[];
   }
 
   static async search({
@@ -124,7 +124,7 @@ export default class Project {
     );
     if (error) throw error;
 
-    return { data, pageCount };
+    return { data: data as ProjectData[], pageCount };
   }
 
   static async put(
@@ -144,7 +144,7 @@ export default class Project {
 
     if (error) throw error;
 
-    return data;
+    return data as ProjectData;
   }
 
   static async post(fields: ProjectCreatable): Promise<ProjectData> {
@@ -158,7 +158,7 @@ export default class Project {
 
     if (error) throw error;
 
-    return data;
+    return data as ProjectData;
   }
 
   static async del(id?: number) {

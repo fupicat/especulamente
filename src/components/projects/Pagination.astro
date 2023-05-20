@@ -93,7 +93,14 @@ const pageNumbers = generatePageNumbers(currentPage, pageCount);
         {number === currentPage ? (
           <strong>{number}</strong>
         ) : (
-          <a href={`/media?page=${number}`}>{number}</a>
+          <a
+            href={((url: URL): string | null => {
+              url.searchParams.set("page", `${number}`);
+              return url.toString();
+            })(url)}
+          >
+            {number}
+          </a>
         )}
       </span>
     ))

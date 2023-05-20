@@ -3,6 +3,10 @@ import "7.css/dist/7.scoped.css";
 import Profile from "@/models/Profile";
 
 const profiles = await Profile.all();
+
+const search = Astro.url.searchParams.get("q") ?? "";
+const types = Astro.url.searchParams.get("types")?.split(",") || [];
+const tags = Astro.url.searchParams.get("tags")?.split(",") || [];
 ---
 
 <div class="header"><p>busca avançada</p></div>
@@ -14,6 +18,7 @@ const profiles = await Profile.all();
       placeholder="O que você quer..."
       type="search"
       name="q"
+      value={search}
     />
   </div>
   <div class="filter">
@@ -27,7 +32,7 @@ const profiles = await Profile.all();
           type="checkbox"
           id="filter-type-image"
           name="image"
-          checked={Astro.url.pathname === "/media"}
+          checked={Astro.url.pathname === "/media" || types.includes("image")}
         />
         <label for="filter-type-image">Imagens</label>
       </div>
@@ -36,20 +41,35 @@ const profiles = await Profile.all();
           type="checkbox"
           id="filter-type-video"
           name="video"
-          checked={Astro.url.pathname === "/media"}
+          checked={Astro.url.pathname === "/media" || types.includes("video")}
         />
         <label for="filter-type-video">Vídeos</label>
       </div>
       <div class="field-row">
-        <input type="checkbox" id="filter-type-game" name="game" />
+        <input
+          type="checkbox"
+          id="filter-type-game"
+          name="game"
+          checked={Astro.url.pathname === "/games" || types.includes("game")}
+        />
         <label for="filter-type-game">Jogos</label>
       </div>
       <div class="field-row">
-        <input type="checkbox" id="filter-type-document" name="document" />
+        <input
+          type="checkbox"
+          id="filter-type-document"
+          name="document"
+          checked={types.includes("document")}
+        />
         <label for="filter-type-document">Documentos</label>
       </div>
       <div class="field-row">
-        <input type="checkbox" id="filter-type-blog" name="blog" />
+        <input
+          type="checkbox"
+          id="filter-type-blog"
+          name="blog"
+          checked={types.includes("blog")}
+        />
         <label for="filter-type-blog">Blogs</label>
       </div>
       <div class="field-row">
@@ -66,6 +86,7 @@ const profiles = await Profile.all();
       name="tags"
       placeholder="tag1, tag2, tag3..."
       title="Tags reparadas por vírgula"
+      value={tags.join(", ")}
     />
   </div>
   <div class="filter">
