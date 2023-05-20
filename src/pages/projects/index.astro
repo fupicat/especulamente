@@ -14,6 +14,9 @@ const projects = await Project.search({
   query: Astro.url.searchParams.get("q") ?? "",
   types: Astro.url.searchParams.get("types")?.split(",") || [],
   tags: Astro.url.searchParams.get("tags")?.split(",") || [],
+  authors: Astro.url.searchParams.get("authors")?.split(",") || [],
+  nsfw: !Astro.url.searchParams.has("sfw"),
+  oldest: Astro.url.searchParams.has("oldest"),
   perPage: 9,
   page: currentPage,
 });

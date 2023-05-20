@@ -7,6 +7,9 @@ const profiles = await Profile.all();
 const search = Astro.url.searchParams.get("q") ?? "";
 const types = Astro.url.searchParams.get("types")?.split(",") || [];
 const tags = Astro.url.searchParams.get("tags")?.split(",") || [];
+const authors = Astro.url.searchParams.get("authors")?.split(",") || [];
+const nsfw = !Astro.url.searchParams.has("sfw");
+const oldest = Astro.url.searchParams.has("oldest");
 ---
 
 <div class="header"><p>busca avançada</p></div>
@@ -90,7 +93,9 @@ const tags = Astro.url.searchParams.get("tags")?.split(",") || [];
     />
   </div>
   <div class="filter">
-    <label for="filter-author">Autores</label>
+    <label for="filter-author"
+      >Autores TODO: SUBSTITUIR POR LISTA DE CHECKBOXES</label
+    >
     <select
       id="filter-author"
       name="authors"
@@ -99,14 +104,19 @@ const tags = Astro.url.searchParams.get("tags")?.split(",") || [];
     >
       {
         profiles.map((profile) => (
-          <option value={profile.username}>{profile.nickname}</option>
+          <option
+            value={profile.username}
+            selected={authors.includes(profile.username)}
+          >
+            {profile.nickname}
+          </option>
         ))
       }
     </select>
   </div>
   <div class="filter">
     <div class="field-row">
-      <input type="checkbox" id="filter-nsfw" name="nsfw" checked />
+      <input type="checkbox" id="filter-nsfw" name="nsfw" checked={nsfw} />
       <label for="filter-nsfw">Mostrar crucificamente (NSFW)</label>
     </div>
   </div>
@@ -114,7 +124,7 @@ const tags = Astro.url.searchParams.get("tags")?.split(",") || [];
     <label for="filter-order">Ordenar por</label>
     <select id="filter-order" name="order">
       <option value="recent">Mais recentes</option>
-      <option value="oldest">Mais antigos</option>
+      <option value="oldest" selected={oldest}>Mais antigos</option>
     </select>
   </div>
   <button type="submit" class="default">Buscar</button>

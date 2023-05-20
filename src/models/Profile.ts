@@ -47,11 +47,11 @@ export default class Profile {
         .from("profiles")
         .select("*")
         .eq("username", username)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
-      return data || null;
+      return (data as ProfileData) || null;
     }
 
     if (id) {
@@ -59,11 +59,11 @@ export default class Profile {
         .from("profiles")
         .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
-      return data || null;
+      return (data as ProfileData) || null;
     }
 
     return null;
@@ -91,7 +91,7 @@ export default class Profile {
 
     if (error) throw error;
 
-    return data;
+    return data as ProfileData;
   }
 
   /**
