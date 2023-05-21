@@ -5,7 +5,9 @@ import Profile from "@/models/Profile";
 
 const sessionProfile = await Profile.current(Astro);
 
-if (!sessionProfile) return Astro.redirect("/404");
+if (!sessionProfile) {
+  return Astro.redirect("/404");
+}
 ---
 
 <Layout
@@ -13,7 +15,7 @@ if (!sessionProfile) return Astro.redirect("/404");
   profile={sessionProfile}
   id="editar_conta"
 >
-  <form>
+  <form class="win7">
     <label for="username">Nome de usuário</label>
     <input
       type="text"
@@ -40,14 +42,24 @@ if (!sessionProfile) return Astro.redirect("/404");
       height="200"
     />
     <input type="file" accept="image/*" name="avatar" id="avatar" />
+    <button id="password-reset">Enviar e-mail de recuperação de senha</button>
     <button type="submit">salvar</button>
   </form>
 </Layout>
 
 <script>
-  const avatarPicker = document.querySelector("#avatar") as HTMLInputElement;
-  const avatarImg = document.querySelector("#avatar_img") as HTMLImageElement;
+  import { supabase } from "@/lib/supabaseClient";
+
+  const avatarPicker = document.querySelector(
+    "#editar_conta #avatar"
+  ) as HTMLInputElement;
+  const avatarImg = document.querySelector(
+    "#editar_conta #avatar_img"
+  ) as HTMLImageElement;
   const form = document.querySelector("#editar_conta form") as HTMLFormElement;
+  const passwordReset = document.querySelector(
+    "#editar_conta #password-reset"
+  ) as HTMLButtonElement;
 
   avatarPicker.addEventListener("change", (event) => {
     const target = event.target as HTMLInputElement;
@@ -58,6 +70,22 @@ if (!sessionProfile) return Astro.redirect("/404");
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     onSubmit();
+  });
+
+  passwordReset.addEventListener("click", async (event) => {
+    event.preventDefault();
+    const user = await supabase.auth.getUser();
+    if (user.error) {
+      alert("Você não tá logado.");
+      return;
+    }
+
+    const email = user.data.user.email!;
+
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `https://especulamente.netlify.app/admin/recuperar-senha`,
+    });
+    alert("Um e-mail foi enviado para redefinir sua senha!");
   });
 
   async function onSubmit() {

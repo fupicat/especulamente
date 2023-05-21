@@ -1,0 +1,55 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Profile from "@/models/Profile";
+
+const sessionProfile = await Profile.current(Astro);
+---
+
+<Layout
+  title="Recuperar senha"
+  profile={sessionProfile}
+  id="password-reset-page"
+>
+  <h2>Recuperar senha</h2>
+  <form>
+    <label for="new-password">Nova senha</label>
+    <input type="password" id="new-password" name="new-password" />
+    <label for="confirm-password">Confirmar senha</label>
+    <input type="password" id="confirm-password" name="confirm-password" />
+    <button type="submit">Enviar</button>
+  </form>
+</Layout>
+
+<script>
+  import { supabase } from "@/lib/supabaseClient";
+
+  const form = document.querySelector(
+    "#password-reset-page form"
+  ) as HTMLFormElement;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(form);
+
+    if (formData.get("new-password") !== formData.get("confirm-password")) {
+      alert("Senhas não coincidem!");
+      return;
+    }
+
+    if (formData.get("new-password") === "") {
+      alert("Põe uma senha aí!");
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({
+      password: formData.get("new-password") as string,
+    });
+
+    if (error) {
+      alert(JSON.stringify(error));
+      return;
+    }
+
+    alert("A senha foi mudada!");
+  });
+</script>

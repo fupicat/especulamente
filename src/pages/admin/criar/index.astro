@@ -4,10 +4,17 @@ import Profile from "@/models/Profile";
 
 const sessionProfile = await Profile.current(Astro);
 
-if (!sessionProfile) return Astro.redirect("/403");
+if (!sessionProfile) {
+  return Astro.redirect("/403");
+}
 ---
 
 <Layout title="Criar" profile={sessionProfile}>
   <h1>O que você quer criar?</h1>
   <a href="/admin/criar/media">Mídia</a>
+  <pre>
+    &gt;criar projeto if aparecer
+    &gt;then aparecer itens
+    &gt;if itens aparecer then then
+  </pre>
 </Layout>
