@@ -82,9 +82,13 @@ if (!sessionProfile) {
 
     const email = user.data.user.email!;
 
-    await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `https://especulamente.netlify.app/admin/recuperar-senha`,
     });
+    if (error) {
+      alert(error.message);
+      return;
+    }
     alert("Um e-mail foi enviado para redefinir sua senha!");
   });
 

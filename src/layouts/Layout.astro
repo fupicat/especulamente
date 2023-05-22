@@ -39,6 +39,17 @@ const { title, profile, id } = Astro.props;
       <slot />
     </main>
     <BarraDeBaixo />
+    <div class="pobre">
+      <img
+        src={`/img/pobre${Math.round(Math.random()) + 1}.png`}
+        alt="Pobre."
+      />
+      <p>
+        <a href="https://lista.mercadolivre.com.br/comptuador"
+          >Compre um computador.</a
+        >
+      </p>
+    </div>
   </body>
 </html>
 
@@ -47,7 +58,7 @@ const { title, profile, id } = Astro.props;
   import { supabase } from "../lib/supabaseClient";
 
   supabase.auth.onAuthStateChange((event, session) => {
-    if (event === "SIGNED_OUT" || event === "USER_DELETED") {
+    if (event === "SIGNED_OUT") {
       const expires = new Date(0).toUTCString();
       document.cookie = `my-access-token=; path=/; expires=${expires}; SameSite=Lax; secure`;
       document.cookie = `my-refresh-token=; path=/; expires=${expires}; SameSite=Lax; secure`;
@@ -95,6 +106,42 @@ const { title, profile, id } = Astro.props;
     max-width: 64rem;
     width: 100%;
     margin: auto;
+  }
+
+  body > .pobre {
+    @media (min-width: 400px) {
+      display: none !important;
+    }
+
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: black;
+    color: white;
+
+    display: flex;
+    gap: 2rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+    }
+
+    p {
+      text-align: center;
+    }
+
+    a {
+      text-decoration: underline;
+    }
   }
 </style>
 

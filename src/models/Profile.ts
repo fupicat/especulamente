@@ -9,6 +9,10 @@ export type ProfileData = {
   avatar_url: string | null;
   bio: string;
   created_at: Date;
+  banner_url: string | null;
+  background_url: string | null;
+  custom_css: string | null;
+  color: string | null;
 };
 
 export type ProfileEditable = {
@@ -16,6 +20,10 @@ export type ProfileEditable = {
   nickname?: string | null;
   avatar_url?: string | null;
   bio?: string;
+  banner_url?: string | null;
+  background_url?: string | null;
+  custom_css?: string | null;
+  color?: string | null;
 };
 
 export default class Profile {
