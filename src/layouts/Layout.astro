@@ -8,9 +8,15 @@ export interface Props {
   title?: string;
   profile: ProfileData | null;
   id?: string;
+  background_url?: string;
+  custom_css?: string;
 }
 
-const { title, profile, id } = Astro.props;
+const { title, profile, id, custom_css } = Astro.props;
+
+let background_url = Astro.props.background_url
+  ? `url("${Astro.props.background_url}")`
+  : 'url("/img/backgrounds/default.png")';
 ---
 
 <!DOCTYPE html>
@@ -35,9 +41,11 @@ const { title, profile, id } = Astro.props;
   </head>
   <body>
     <BarraDeCima profile={profile} />
-    <main id={id}>
-      <slot />
-    </main>
+    <div class="background">
+      <main id={id}>
+        <slot />
+      </main>
+    </div>
     <BarraDeBaixo />
     <div class="pobre">
       <img
@@ -98,14 +106,30 @@ const { title, profile, id } = Astro.props;
 
 <GlobalStyles />
 
-<style lang="scss" is:global>
-  body > main {
-    background: rgba(255, 255, 255, 0.3);
-    box-shadow: 0px 0px 14px 2px #000000;
+<style lang="scss" is:global define:vars={{ background_url }}>
+  body > .background {
+    background-color: black;
+    background-image: linear-gradient(
+        90deg,
+        rgb(0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) 5%,
+        rgba(0, 0, 0, 0) 95%,
+        rgb(0, 0, 0) 100%
+      ),
+      var(--background_url);
+    background-repeat: repeat-y;
+    background-position: top center;
+    background-size: 2048px;
+    position: relative;
 
-    max-width: 64rem;
-    width: 100%;
-    margin: auto;
+    > main {
+      background: rgba(255, 255, 255, 0.4);
+      box-shadow: 0px 0px 14px 2px #000000;
+
+      max-width: 64rem;
+      width: 100%;
+      margin: auto;
+    }
   }
 
   body > .pobre {
@@ -152,3 +176,5 @@ const { title, profile, id } = Astro.props;
     }
   </style>
 </noscript>
+
+{custom_css && <style is:raw set:html={custom_css} />}

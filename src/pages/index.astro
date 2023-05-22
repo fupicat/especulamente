@@ -7,7 +7,12 @@ import Profile from "@/models/Profile";
 const sessionProfile = await Profile.current(Astro);
 ---
 
-<Layout profile={sessionProfile} id="home">
+<Layout
+  profile={sessionProfile}
+  id="home"
+  background_url="/img/backgrounds/desert.png"
+  custom_css="* {background-image: url('https://i.imgur.com/UGgG4Yv.png') !important;}"
+>
   <div class="container">
     <Cramunhao />
     <aside>
