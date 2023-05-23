@@ -1,0 +1,72 @@
+#saving-dialog {
+  position: fixed;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(0, 0, 0, 0.8);
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  animation: saving-appear 0.5s;
+
+  @keyframes saving-appear {
+    from {
+      height: 0%;
+    }
+
+    to {
+      height: 100%;
+    }
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/img/sprites/cramunhao-grid.png");
+    background-position: center;
+    z-index: -1;
+    opacity: 0.5;
+  }
+
+  img {
+    width: 72px;
+    height: 72px;
+    animation: saving-img-spin 1s cubic-bezier(.49, -0.37, .47, 1.43) infinite;
+
+    @keyframes saving-img-spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      60% {
+        transform: rotate(360deg) scale(110%);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
+  p.hooge {
+    position: relative;
+    font-size: 56px;
+    color: white;
+    margin-top: -76px;
+  }
+
+  p.arial {
+    margin-top: 32px;
+    color: white;
+  }
+}
