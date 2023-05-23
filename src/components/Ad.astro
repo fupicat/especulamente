@@ -1,0 +1,42 @@
+---
+const ads = [
+  { src: "neon-mania.png", alt: "Neon Mania", url: "/404" },
+  {
+    src: "velhote1.png",
+    alt: "Velhote",
+    url: "https://scratch.mit.edu/users/velhote123/",
+  },
+  {
+    src: "velhote2.png",
+    alt: "Velhote",
+    url: "https://scratch.mit.edu/users/velhote123/",
+  },
+];
+
+const ad = ads[Math.floor(Math.random() * ads.length)];
+---
+
+<a href={ad.url} class="banner-ad">
+  <img src="/img/detector-de-viciado-em-chad.png" alt="" />
+  <img src={`/img/ads/${ad.src}`} alt={ad.alt} />
+</a>
+
+<style lang="scss" is:global>
+  .banner-ad {
+    display: block;
+    margin-top: 9px;
+    position: relative;
+
+    width: 232px;
+    height: 174px;
+    background-color: rgba(166, 166, 166, 0.2);
+
+    img {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 2px;
+    }
+  }
+</style>

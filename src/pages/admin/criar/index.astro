@@ -1,20 +1,26 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Error from "@/layouts/Error.astro";
 import Profile from "@/models/Profile";
 
 const sessionProfile = await Profile.current(Astro);
 
 if (!sessionProfile) {
-  return Astro.redirect("/403");
+  Astro.response.status = 403;
 }
 ---
 
-<Layout title="Criar" profile={sessionProfile}>
-  <h1>O que você quer criar?</h1>
-  <a href="/admin/criar/media">Mídia</a>
-  <pre>
-    &gt;criar projeto if aparecer
-    &gt;then aparecer itens
-    &gt;if itens aparecer then then
-  </pre>
-</Layout>
+{!sessionProfile && <Error code="403" profile={sessionProfile} />}
+
+{
+  sessionProfile && (
+    <Layout title="Criar" profile={sessionProfile}>
+      <h1>O que você quer criar?</h1>
+      <a href="/admin/criar/media">Mídia</a>
+      <pre>
+        &gt;criar projeto if aparecer &gt;then aparecer itens &gt;if itens
+        aparecer then then
+      </pre>
+    </Layout>
+  )
+}

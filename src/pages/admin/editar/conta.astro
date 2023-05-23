@@ -4,118 +4,131 @@ import "@/lib/saving-progress/styles.scss";
 import Layout from "@/layouts/Layout.astro";
 import { profilePicture } from "@/lib/clientShorthand";
 import Profile from "@/models/Profile";
+import LoginRequired from "@/layouts/LoginRequired.astro";
 
 const sessionProfile = await Profile.current(Astro);
 
 if (!sessionProfile) {
-  return Astro.redirect("/404");
+  Astro.response.status = 403;
 }
 ---
 
-<Layout
-  title={`Editando conta ${sessionProfile.nickname}`}
-  profile={sessionProfile}
-  id="editar_conta"
->
-  <form class="win7">
-    <label for="username">Nome de usuário</label>
-    <input
-      type="text"
-      id="username"
-      name="username"
-      pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
-      value={sessionProfile.username}
-    />
-    <label for="nickname">Apelido</label>
-    <input
-      type="text"
-      id="nickname"
-      name="nickname"
-      value={sessionProfile.nickname}
-    />
-    <label for="bio">Sobre mim</label>
-    <textarea class="bio" id="bio" name="bio" set:text={sessionProfile.bio} />
-    <label for="avatar">Avatar</label>
-    <img
-      id="avatar_img"
-      src={profilePicture(sessionProfile.avatar_url)}
-      alt={`Foto de perfil de ${sessionProfile.username}`}
-      width="200"
-      height="200"
-    />
-    <input type="file" accept="image/*" name="avatar" id="avatar" />
-    <button id="password-reset">Enviar e-mail de recuperação de senha</button>
-    <button type="submit">salvar</button>
-  </form>
-</Layout>
+<LoginRequired profile={sessionProfile}>
+  <Layout
+    title={`Editando conta ${sessionProfile?.nickname}`}
+    profile={sessionProfile}
+    id="editar_conta"
+  >
+    <form class="win7">
+      <label for="username">Nome de usuário</label>
+      <input
+        type="text"
+        id="username"
+        name="username"
+        pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        value={sessionProfile?.username}
+      />
+      <label for="nickname">Apelido</label>
+      <input
+        type="text"
+        id="nickname"
+        name="nickname"
+        value={sessionProfile?.nickname}
+      />
+      <label for="bio">Sobre mim</label>
+      <textarea
+        class="bio"
+        id="bio"
+        name="bio"
+        set:text={sessionProfile?.bio}
+      />
+      <label for="avatar">Avatar</label>
+      <img
+        id="avatar_img"
+        src={profilePicture(sessionProfile?.avatar_url)}
+        alt={`Foto de perfil de ${sessionProfile?.username}`}
+        width="200"
+        height="200"
+      />
+      <input type="file" accept="image/*" name="avatar" id="avatar" />
+      <button id="password-reset">Enviar e-mail de recuperação de senha</button>
+      <button type="submit">salvar</button>
+    </form>
+  </Layout>
 
-<script>
-  import { removeSavingDialog, showSavingDialog } from "@/lib/saving-progress";
-  import { supabase } from "@/lib/supabaseClient";
+  <script>
+    import {
+      removeSavingDialog,
+      showSavingDialog,
+    } from "@/lib/saving-progress";
+    import { supabase } from "@/lib/supabaseClient";
 
-  const avatarPicker = document.querySelector(
-    "#editar_conta #avatar"
-  ) as HTMLInputElement;
-  const avatarImg = document.querySelector(
-    "#editar_conta #avatar_img"
-  ) as HTMLImageElement;
-  const form = document.querySelector("#editar_conta form") as HTMLFormElement;
-  const passwordReset = document.querySelector(
-    "#editar_conta #password-reset"
-  ) as HTMLButtonElement;
+    const avatarPicker = document.querySelector(
+      "#editar_conta #avatar"
+    ) as HTMLInputElement;
+    const avatarImg = document.querySelector(
+      "#editar_conta #avatar_img"
+    ) as HTMLImageElement;
+    const form = document.querySelector(
+      "#editar_conta form"
+    ) as HTMLFormElement;
+    const passwordReset = document.querySelector(
+      "#editar_conta #password-reset"
+    ) as HTMLButtonElement;
 
-  avatarPicker.addEventListener("change", (event) => {
-    const target = event.target as HTMLInputElement;
-    const fileUploaded = target.files ? target.files[0] : null;
-    if (fileUploaded) avatarImg.src = URL.createObjectURL(fileUploaded);
-  });
-
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    onSubmit();
-  });
-
-  passwordReset.addEventListener("click", async (event) => {
-    event.preventDefault();
-    const user = await supabase.auth.getUser();
-    if (user.error) {
-      alert("Você não tá logado.");
-      return;
-    }
-
-    const email = user.data.user.email!;
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `https://especulamente.netlify.app/admin/recuperar-senha`,
+    avatarPicker.addEventListener("change", (event) => {
+      const target = event.target as HTMLInputElement;
+      const fileUploaded = target.files ? target.files[0] : null;
+      if (fileUploaded) avatarImg.src = URL.createObjectURL(fileUploaded);
     });
-    if (error) {
-      alert(error.message);
-      return;
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      onSubmit();
+    });
+
+    passwordReset.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const user = await supabase.auth.getUser();
+      if (user.error) {
+        alert("Você não tá logado.");
+        return;
+      }
+
+      const email = user.data.user.email!;
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `https://especulamente.netlify.app/admin/recuperar-senha`,
+      });
+      if (error) {
+        alert(error.message);
+        return;
+      }
+      alert("Um e-mail foi enviado para redefinir sua senha!");
+    });
+
+    async function onSubmit() {
+      const data = new FormData(form);
+
+      showSavingDialog();
+
+      const response = await (
+        await fetch("/admin/actions/account", {
+          method: "put",
+          body: data,
+        })
+      ).json();
+
+      if (response.error) {
+        alert(response.error.message);
+        removeSavingDialog();
+        return;
+      }
+
+      const newUsername = (form.querySelector("#username") as HTMLInputElement)
+        .value;
+
+      window.location.href = `/users/${newUsername}`;
     }
-    alert("Um e-mail foi enviado para redefinir sua senha!");
-  });
-
-  async function onSubmit() {
-    const data = new FormData(form);
-
-    showSavingDialog();
-
-    const response = await (
-      await fetch("/admin/actions/account", {
-        method: "put",
-        body: data,
-      })
-    ).json();
-
-    if (response.error) {
-      alert(response.error.message);
-      removeSavingDialog();
-      return;
-    }
-
-    const newUsername = (form.querySelector("#username") as HTMLInputElement)
-      .value;
-
-    window.location.href = `/users/${newUsername}`;
-  }
-</script>
+  </script>
+</LoginRequired>

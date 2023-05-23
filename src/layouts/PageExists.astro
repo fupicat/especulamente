@@ -1,0 +1,14 @@
+---
+import type { ProfileData } from "@/models/Profile";
+import Error from "@/layouts/Error.astro";
+
+export interface Props {
+  profile: ProfileData | null;
+  exists: boolean;
+}
+
+const { profile, exists } = Astro.props;
+---
+
+{!exists && <Error code="404" profile={profile} />}
+{exists && <slot />}

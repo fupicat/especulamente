@@ -1,0 +1,13 @@
+---
+import type { ProfileData } from "@/models/Profile";
+import Error from "@/layouts/Error.astro";
+
+export interface Props {
+  profile: ProfileData | null;
+}
+
+const { profile } = Astro.props;
+---
+
+{!profile && <Error code="403" profile={profile} />}
+{profile && <slot />}

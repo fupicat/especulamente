@@ -1,5 +1,9 @@
 ---
 import { profilePicture } from "@/lib/clientShorthand";
+import Project from "@/models/Project";
+import Ad from "./Ad.astro";
+
+const projects = await Project.search({ page: 1, perPage: 5 });
 ---
 
 <aside id="barra-do-lado">
@@ -12,25 +16,49 @@ import { profilePicture } from "@/lib/clientShorthand";
       <div class="header"><p>novidades</p></div>
       <div class="project-list">
         {
-          [0, 0, 0, 0, 0].map((project) => (
+          projects.data.map((project) => (
             <div class="project arial">
-              <a href="/" class="thumbnail">
+              <a href={`/projects/${project.id}`} class="thumbnail">
                 <img class="static" src="/img/static.gif" alt="" />
-                <img class="icon" src="/img/sprites/jogos.png" alt="Jogo" />
-                <img class="image" src="/img/defaultpfp.png" alt="Thumbnail" />
+                {project.type === "game" ? (
+                  <img class="icon" src="/img/sprites/jogos.png" alt="Jogo" />
+                ) : ["image", "video"].includes(project.type) ? (
+                  <img class="icon" src="/img/sprites/midia.png" alt="Mídia" />
+                ) : project.type === "blog" ? (
+                  <img class="icon" src="/img/sprites/blogs.png" alt="Blog" />
+                ) : ["document", "page"].includes(project.type) ? (
+                  <img
+                    class="icon"
+                    src="/img/sprites/bofetadamente.png"
+                    alt="Bofetadamente"
+                  />
+                ) : (
+                  <img
+                    class="icon"
+                    src="/img/sprites/projetos.png"
+                    alt="Projetos"
+                  />
+                )}
+                <img
+                  class="image"
+                  src={profilePicture(project.thumbnail_url)}
+                  alt={project.title}
+                />
               </a>
               <div class="info">
                 <a href="/" class="title">
-                  Esse jogo esse jogo esse jogo esse jogo esse jogo esse jogo
+                  {project.title}
                 </a>
-                <a href="/users/fupicat" class="user">
+                <a href={`/users/${project.author.username}`} class="user">
                   <img
-                    src={profilePicture(null)}
-                    alt="Foto de perfil de Fupicat"
+                    src={profilePicture(project.author.avatar_url)}
+                    alt={project.author.nickname}
                   />
                   <div class="info">
-                    <p class="time">6 horas atrás</p>
-                    <p class="title">fupicat, o legal</p>
+                    <p class="time">
+                      {new Date(project.created_at).toLocaleDateString("pt-BR")}
+                    </p>
+                    <p class="title">{project.author.nickname}</p>
                   </div>
                 </a>
               </div>
@@ -42,10 +70,7 @@ import { profilePicture } from "@/lib/clientShorthand";
         <p class="arial">&lt;&lt; Ver novidades anteriores</p>
       </a>
       <div class="header"><p>anuncios fake lmao</p></div>
-      <a href="/404" class="ad">
-        <img src="/img/detector-de-viciado-em-chad.png" alt="" />
-        <img src="/img/ads/neon-mania.png" alt="Neon Mania" />
-      </a>
+      <Ad />
     </div>
   </div>
 </aside>
@@ -193,6 +218,8 @@ import { profilePicture } from "@/lib/clientShorthand";
               .static {
                 width: 4rem;
                 height: 3rem;
+                object-fit: cover;
+                object-position: center;
               }
 
               .static {
@@ -278,24 +305,6 @@ import { profilePicture } from "@/lib/clientShorthand";
 
           &:hover {
             text-decoration: underline;
-          }
-        }
-
-        .ad {
-          display: block;
-          margin-top: 9px;
-          position: relative;
-
-          width: 232px;
-          height: 174px;
-          background-color: rgba(166, 166, 166, 0.2);
-
-          img {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            right: 2px;
-            bottom: 2px;
           }
         }
       }

@@ -1,0 +1,126 @@
+---
+import type { ProfileData } from "@/models/Profile";
+import Layout from "./Layout.astro";
+
+export interface Props {
+  profile: ProfileData | null;
+  code: "404" | "403";
+}
+
+const { profile, code } = Astro.props;
+
+const errors = {
+  "403": {
+    title: "403 não autorizado",
+    description:
+      "Você precisa ser um Especulativo para acessar essa página.\nSe você for, veja se fez login.",
+    images: [
+      { src: "neon1.png", author: "neontflame" },
+      { src: "neon2.png", author: "neontflame" },
+    ],
+  },
+  "404": {
+    title: "404 não encontrado",
+    description:
+      "Se você estava tentando achar algo, não está mais aqui, ou nunca existiu pra começo de conversa.",
+    images: [
+      { src: "neon1.png", author: "neontflame" },
+      { src: "neon2.png", author: "neontflame" },
+      { src: "neon3.png", author: "neontflame" },
+      { src: "neon4.png", author: "neontflame" },
+      { src: "neon5.png", author: "neontflame" },
+    ],
+  },
+};
+
+const error =
+  errors[code].images[Math.floor(Math.random() * errors[code].images.length)];
+---
+
+<Layout profile={profile} title={errors[code].title} id="error-page">
+  <div class="container">
+    <img src={`/img/errors/${code}/${error.src}`} alt={`Erro ${code}`} />
+    <div class="box">
+      <div class="top"></div>
+      <div class="bottom underline">
+        <p class="arial credit">Imagem por {error.author}</p>
+        <img
+          src={`/img/errors/${code}.png`}
+          alt={errors[code].title}
+          class="title"
+        />
+        <p class="arial description">{errors[code].description}</p>
+        <a href="/" class="arial">Voltar para a página inicial</a>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style lang="scss" is:global>
+  #error-page {
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      > img {
+        max-width: 583px;
+        box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.5);
+        position: relative;
+        margin-top: 26px;
+      }
+
+      .box {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        margin-top: -224px;
+        margin-bottom: 46px;
+        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.25);
+
+        .top {
+          height: 8px;
+          image-rendering: pixelated;
+          background: url("/img/sprites/barra-do-lado-grid-topo.png");
+        }
+
+        .bottom {
+          image-rendering: pixelated;
+          background: url("/img/sprites/cramunhao-grid.png");
+          padding: 215px 16px 16px;
+
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .credit {
+            color: white;
+            font-size: 12px;
+            width: 583px;
+            text-align: right;
+            margin-top: 4px;
+          }
+
+          .title {
+            margin-top: 16px;
+          }
+
+          .description {
+            margin-top: 16px;
+            color: white;
+            max-width: 500px;
+            text-align: center;
+          }
+
+          a {
+            color: rgb(255, 255, 255, 0.5);
+            font-weight: bold;
+            font-style: italic;
+            margin-top: 46px;
+            margin-bottom: 16px;
+          }
+        }
+      }
+    }
+  }
+</style>

@@ -1,5 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import PageExists from "@/layouts/PageExists.astro";
 import { profilePicture } from "@/lib/clientShorthand";
 import Profile from "@/models/Profile";
 
@@ -9,23 +10,25 @@ const sessionProfile = await Profile.current(Astro);
 
 const profile = await Profile.get({ username: Astro.params.user });
 
-if (!profile) return Astro.redirect("/404");
+if (!profile) {
+  Astro.response.status = 404;
+}
 ---
 
-<Layout title={profile.nickname} profile={sessionProfile}>
-  {
-    profile && (
-      <div class="profile">
-        <h1>{profile.username}</h1>
-        <div class="bio" set:html={marked.parse(profile.bio)} />
-        <img
-          src={profilePicture(profile.avatar_url)}
-          alt={`Foto de perfil de ${profile.username}`}
-          width="200"
-          height="200"
-        />
-        <p class="date">{new Date(profile.created_at).toLocaleString("pt")}</p>
-      </div>
-    )
-  }
-</Layout>
+<PageExists profile={sessionProfile} exists={!!profile}>
+  <Layout title={profile?.nickname} profile={sessionProfile}>
+    <div class="profile">
+      <h1>{profile?.username}</h1>
+      <div class="bio" set:html={marked.parse(profile?.bio || "")} />
+      <img
+        src={profilePicture(profile?.avatar_url)}
+        alt={`Foto de perfil de ${profile?.username}`}
+        width="200"
+        height="200"
+      />
+      <p class="date">
+        {new Date(profile?.created_at || "").toLocaleString("pt")}
+      </p>
+    </div>
+  </Layout>
+</PageExists>

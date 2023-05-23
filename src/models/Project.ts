@@ -1,42 +1,40 @@
 import { server } from "@/lib/supabaseServer";
 import type { ProfileData } from "./Profile";
 
-export type BaseProjectData<Type, Content> = {
+type ProjectType = "image" | "video" | "game" | "document" | "blog" | "page";
+
+export type ProjectData = {
   id: number;
   created_at: string;
   author: ProfileData;
-  type: Type;
+  type: ProjectType;
   title: string;
   description?: string;
   thumbnail_url?: string;
-  content?: Content;
+  content?: any;
   tags?: string[];
   nsfw: boolean;
 };
 
-export type BaseProjectCreatable<Type, Content> = {
+export type ProjectCreatable = {
   author: string;
-  type?: Type;
+  type?: ProjectType;
   title: string;
   description?: string | null;
   thumbnail_url?: string | null;
-  content?: Content;
+  content?: any;
   tags?: string[] | null;
   nsfw: boolean;
 };
 
-export type BaseProjectEditable<Content> = {
+export type ProjectEditable = {
   title?: string | null;
   description?: string | null;
   thumbnail_url?: string | null;
-  content?: Content | null;
+  content?: any | null;
   tags?: string[] | null;
   nsfw?: boolean | null;
 };
-
-export type ProjectData = BaseProjectData<string, any>;
-export type ProjectCreatable = BaseProjectCreatable<string, any>;
-export type ProjectEditable = BaseProjectEditable<any>;
 
 export default class Project {
   static placeholders: ProjectData[] = [];

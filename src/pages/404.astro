@@ -1,18 +1,8 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import Error from "@/layouts/Error.astro";
 import Profile from "@/models/Profile";
 
 const sessionProfile = await Profile.current(Astro);
-
-function getRandomInt(min: number, max: number) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-const image = `/img/errors/404-${getRandomInt(1, 2)}.png`;
 ---
 
-<Layout title="Não encontrado" profile={sessionProfile}>
-  <img src={image} alt="Erro 404" />
-</Layout>
+<Error code="404" profile={sessionProfile} />
