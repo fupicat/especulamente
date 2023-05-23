@@ -18,35 +18,42 @@ const { profile } = Astro.props;
       <div class="menu">
         <div class="nav-body">
           <nav>
+            <a href="/projects">
+              <div class="icon">
+                <img src="/img/sprites/projetos.png" alt="Projetos" />
+              </div>
+              <p class="hooge">PROJETOS</p>
+            </a>
+            <img src="/img/sprites/separador.png" alt="" class="separator" />
             <a href="/games">
-              <div class="icon" style="width: 32px; margin-right: 8px;">
+              <div class="icon">
                 <img src="/img/sprites/jogos.png" alt="Jogos" />
               </div>
               <p class="hooge">JOGOS</p>
             </a>
             <img src="/img/sprites/separador.png" alt="" class="separator" />
             <a href="/media">
-              <div class="icon" style="width: 29px; margin-right: 10px;">
+              <div class="icon">
                 <img src="/img/sprites/midia.png" alt="Mídia" />
               </div>
               <p class="hooge">MÍDIA</p>
             </a>
             <img src="/img/sprites/separador.png" alt="" class="separator" />
             <a href="/blogs">
-              <div class="icon" style="width: 32px; margin-right: 6px;">
+              <div class="icon">
                 <img src="/img/sprites/blogs.png" alt="Blogs" />
               </div>
               <p class="hooge">BLOGS</p>
             </a>
             <img src="/img/sprites/separador.png" alt="" class="separator" />
             <a href="/bofetadamente">
-              <div class="icon" style="width: 32px; margin-right: 9px;">
+              <div class="icon">
                 <img src="/img/sprites/bofetadamente.png" alt="Bofetadamente" />
               </div>
               <p class="hooge">BOFETADAMENTE</p>
             </a>
           </nav>
-          <div class="search arial">
+          <form class="search arial" id="header-search">
             <input type="search" />
             <button>
               <svg
@@ -62,7 +69,7 @@ const { profile } = Astro.props;
                 ></path>
               </svg>
             </button>
-          </div>
+          </form>
         </div>
         <div class="nav-shadow"></div>
         <div class="tools arial">
@@ -173,6 +180,30 @@ const { profile } = Astro.props;
   })();
 </script>
 
+<script>
+  // Pesquisa
+  const search = document.querySelector<HTMLFormElement>("#header-search")!;
+  const searchInput = search.querySelector<HTMLInputElement>("input")!;
+
+  const nav = document.querySelector<HTMLDivElement>("#barra-de-cima nav")!;
+  searchInput.addEventListener("focus", () => {
+    nav.classList.add("compact");
+    nav.classList.remove("decompact");
+  });
+  searchInput.addEventListener("blur", () => {
+    nav.classList.remove("compact");
+    nav.classList.add("decompact");
+  });
+
+  search.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    window.location.href = `/projects?q=${encodeURIComponent(
+      searchInput.value
+    )}`;
+  });
+</script>
+
 <style lang="scss" is:global>
   header#barra-de-cima {
     box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.7);
@@ -266,6 +297,80 @@ const { profile } = Astro.props;
 
               align-items: flex-end;
 
+              &.compact {
+                a {
+                  .icon {
+                    margin-right: 0px;
+
+                    animation: header-icon-contract 0.4s
+                      cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
+
+                    @keyframes header-icon-contract {
+                      0% {
+                        margin-right: 6px;
+                      }
+                      100% {
+                        margin-right: 0px;
+                      }
+                    }
+                  }
+
+                  p {
+                    max-width: 0px;
+
+                    animation: header-p-contract 0.4s
+                      cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
+
+                    @keyframes header-p-contract {
+                      0% {
+                        max-width: 80px;
+                      }
+                      100% {
+                        max-width: 0px;
+                      }
+                    }
+                  }
+                }
+              }
+
+              &.decompact {
+                a {
+                  .icon {
+                    animation: header-icon-expand 0.8s
+                      cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
+
+                    @keyframes header-icon-expand {
+                      0% {
+                        margin-right: 0px;
+                      }
+                      50% {
+                        margin-right: 0px;
+                      }
+                      100% {
+                        margin-right: 6px;
+                      }
+                    }
+                  }
+
+                  p {
+                    animation: header-p-expand 0.8s
+                      cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
+
+                    @keyframes header-p-expand {
+                      0% {
+                        max-width: 0px;
+                      }
+                      50% {
+                        max-width: 0px;
+                      }
+                      100% {
+                        max-width: 80px;
+                      }
+                    }
+                  }
+                }
+              }
+
               a {
                 display: flex;
                 padding-left: 11px;
@@ -276,6 +381,8 @@ const { profile } = Astro.props;
                 .icon {
                   position: relative;
                   bottom: 2px;
+                  width: 32px;
+                  margin-right: 6px;
 
                   img {
                     position: absolute;
@@ -299,6 +406,9 @@ const { profile } = Astro.props;
                   margin-bottom: 7px;
 
                   position: relative;
+
+                  max-width: 80px;
+                  overflow: hidden;
 
                   text-shadow: 0px 0px 0px transparent, 0px 0px 0px transparent;
                   transition: text-shadow 0.4s
