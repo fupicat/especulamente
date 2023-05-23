@@ -93,26 +93,27 @@ const oldest = Astro.url.searchParams.has("oldest");
     />
   </div>
   <div class="filter">
-    <label for="filter-author"
-      >Autores TODO: SUBSTITUIR POR LISTA DE CHECKBOXES</label
-    >
-    <select
-      id="filter-author"
-      name="authors"
-      multiple
-      title="Segure CTRL para selecionar mais de um."
-    >
+    <label>Autores</label>
+    <ul class="tree-view has-container" id="filter-author">
       {
         profiles.map((profile) => (
-          <option
-            value={profile.username}
-            selected={authors.includes(profile.username)}
-          >
-            {profile.nickname}
-          </option>
+          <li>
+            <div class="field-row">
+              <input
+                type="checkbox"
+                id={"author-" + profile.username}
+                name="authors"
+                value={profile.username}
+                checked={authors.includes(profile.username)}
+              />
+              <label for={"author-" + profile.username}>
+                {profile.nickname}
+              </label>
+            </div>
+          </li>
         ))
       }
-    </select>
+    </ul>
   </div>
   <div class="filter">
     <div class="field-row">
@@ -161,10 +162,9 @@ const oldest = Astro.url.searchParams.has("oldest");
             .join(",")
         );
 
-      const authors = Array.from(
-        form.querySelector<HTMLSelectElement>("select[name='authors']")!
-          .selectedOptions
-      ).map((option) => option.value);
+      const authors = Array.from<any>(
+        form.querySelectorAll("input[name=authors]:checked")
+      ).map((option: HTMLInputElement) => option.value);
       if (authors.length > 0) searchParams.set("authors", authors.join(","));
 
       const sfw =
@@ -187,6 +187,20 @@ const oldest = Astro.url.searchParams.has("oldest");
     align-items: flex-end;
     gap: 12px;
     margin-top: 8px;
+
+    ul.tree-view {
+      padding-left: 14px;
+      overflow: auto;
+      height: 84px;
+
+      li {
+        margin-bottom: 4px;
+
+        label {
+          color: black;
+        }
+      }
+    }
 
     .filter {
       width: 100%;
