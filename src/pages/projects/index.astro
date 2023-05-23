@@ -24,7 +24,12 @@ const projects = await Project.search({
 const pageCount = projects.pageCount;
 ---
 
-<Layout id="projects" title="Projetos" profile={sessionProfile}>
+<Layout
+  id="projects"
+  title="Projetos"
+  profile={sessionProfile}
+  custom_color="rainbow"
+>
   <div class="container">
     <div class="box">
       <div class="top"></div>

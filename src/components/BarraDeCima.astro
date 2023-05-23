@@ -3,13 +3,21 @@ import type { ProfileData } from "@/models/Profile";
 
 export interface Props {
   profile: ProfileData | null;
+  custom_color?: string;
 }
 
-const { profile } = Astro.props;
+const { profile, custom_color } = Astro.props;
 ---
 
 <header id="barra-de-cima">
   <div class="top">
+    {
+      custom_color && (
+        <div
+          class={"header-tint" + (custom_color === "rainbow" ? " rainbow" : "")}
+        />
+      )
+    }
     <div class="container">
       <h1>especulamente.com.br</h1>
       <a href="/" class="logo">
@@ -96,7 +104,15 @@ const { profile } = Astro.props;
       </div>
     </div>
   </div>
-  <div class="bottom"></div>
+  <div class="bottom">
+    {
+      custom_color && (
+        <div
+          class={"header-tint" + (custom_color === "rainbow" ? " rainbow" : "")}
+        />
+      )
+    }
+  </div>
 </header>
 
 <script>
@@ -210,15 +226,34 @@ const { profile } = Astro.props;
     z-index: 1;
     position: relative;
 
+    .header-tint {
+      top: 0;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--custom_color);
+      mix-blend-mode: hue;
+      z-index: 1;
+      pointer-events: none;
+
+      &.rainbow {
+        animation: bg-rainbow-cycle 5s linear infinite;
+      }
+    }
+
     .top {
       background: url("/img/sprites/header-grid.png");
       background-position: left bottom;
       image-rendering: pixelated;
+      position: relative;
 
       .container {
         display: flex;
         gap: 0.5625rem;
         padding-top: 0.875rem;
+        position: relative;
+        image-rendering: auto;
 
         > h1 {
           display: none;
@@ -380,6 +415,7 @@ const { profile } = Astro.props;
 
                 .icon {
                   position: relative;
+                  z-index: 1;
                   bottom: 2px;
                   width: 32px;
                   margin-right: 6px;
@@ -496,6 +532,7 @@ const { profile } = Astro.props;
 
       background: url("/img/sprites/header-grid-bottom.png");
       image-rendering: pixelated;
+      position: relative;
     }
   }
 </style>

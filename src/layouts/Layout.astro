@@ -10,9 +10,11 @@ export interface Props {
   id?: string;
   background_url?: string;
   custom_css?: string;
+  edit_url?: string;
+  custom_color?: string;
 }
 
-const { title, profile, id, custom_css } = Astro.props;
+const { title, profile, id, custom_css, edit_url, custom_color } = Astro.props;
 
 let background_url = Astro.props.background_url
   ? `url("${Astro.props.background_url}")`
@@ -35,8 +37,17 @@ let background_url = Astro.props.background_url
     </title>
   </head>
   <body>
-    <BarraDeCima profile={profile} />
+    <BarraDeCima profile={profile} custom_color={custom_color} />
     <div class="background">
+      {
+        custom_color && (
+          <div
+            class={
+              "background-tint" + (custom_color === "rainbow" ? " rainbow" : "")
+            }
+          />
+        )
+      }
       <main id={id}>
         <slot />
       </main>
@@ -44,8 +55,15 @@ let background_url = Astro.props.background_url
     <BarraDeBaixo />
     {
       profile && (
-        <a id="create" class="create" href="/admin/criar" title="Criar">
+        <a class="create" href="/admin/criar" title="Criar">
           <img src="/img/sprites/create.svg" alt="Criar" />
+        </a>
+      )
+    }
+    {
+      edit_url && (
+        <a class="edit" href={edit_url} title="Editar">
+          <img src="/img/sprites/edit.svg" alt="Editar" />
         </a>
       )
     }
@@ -108,7 +126,7 @@ let background_url = Astro.props.background_url
 
 <GlobalStyles />
 
-<style lang="scss" is:global define:vars={{ background_url }}>
+<style lang="scss" is:global define:vars={{ background_url, custom_color }}>
   body > .background {
     background-color: black;
     background-image: linear-gradient(
@@ -124,6 +142,20 @@ let background_url = Astro.props.background_url
     background-size: 2048px;
     position: relative;
 
+    .background-tint {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--custom_color);
+      mix-blend-mode: hue;
+
+      &.rainbow {
+        animation: bg-rainbow-cycle 5s linear infinite;
+      }
+    }
+
     > main {
       background: rgba(255, 255, 255, 0.4);
       box-shadow: 0px 0px 14px 2px #000000;
@@ -131,6 +163,7 @@ let background_url = Astro.props.background_url
       max-width: 64rem;
       width: 100%;
       margin: auto;
+      position: relative;
     }
   }
 
@@ -170,7 +203,9 @@ let background_url = Astro.props.background_url
     }
   }
 
-  body > #create {
+  body > .create,
+  body > .edit {
+    display: block;
     position: fixed;
     z-index: 2;
     bottom: 1rem;
@@ -186,7 +221,13 @@ let background_url = Astro.props.background_url
     img {
       width: 5rem;
       height: 5rem;
+      display: block;
     }
+  }
+
+  body > .edit {
+    filter: hue-rotate(60deg);
+    bottom: 6rem;
   }
 </style>
 

@@ -16,7 +16,13 @@ if (!profile) {
 ---
 
 <PageExists profile={sessionProfile} exists={!!profile}>
-  <Layout title={profile?.nickname} profile={sessionProfile}>
+  <Layout
+    title={profile?.nickname}
+    profile={sessionProfile}
+    edit_url={profile?.username === sessionProfile?.username
+      ? "/admin/editar/conta"
+      : undefined}
+  >
     <div class="profile">
       <h1>{profile?.username}</h1>
       <div class="bio" set:html={marked.parse(profile?.bio || "")} />
