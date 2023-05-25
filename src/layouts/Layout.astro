@@ -14,11 +14,22 @@ export interface Props {
   custom_color?: string;
 }
 
-const { title, profile, id, custom_css, edit_url, custom_color } = Astro.props;
+const { title, profile, id, edit_url } = Astro.props;
 
-let background_url = Astro.props.background_url
-  ? `url("${Astro.props.background_url}")`
-  : 'url("/img/backgrounds/default.png")';
+const page_custom_color =
+  Astro.props.custom_color || profile?.preferences?.color || undefined;
+
+const page_background_url =
+  Astro.props.background_url ||
+  profile?.preferences?.background_url ||
+  undefined;
+
+const css_background_url = page_background_url
+  ? `url("${page_background_url}")`
+  : "url('/img/backgrounds/default.png')";
+
+const page_custom_css =
+  Astro.props.custom_css || profile?.preferences?.custom_css || undefined;
 ---
 
 <!DOCTYPE html>
@@ -37,13 +48,14 @@ let background_url = Astro.props.background_url
     </title>
   </head>
   <body>
-    <BarraDeCima profile={profile} custom_color={custom_color} />
+    <BarraDeCima profile={profile} custom_color={page_custom_color} />
     <div class="background">
       {
-        custom_color && (
+        !page_background_url && page_custom_color && (
           <div
             class={
-              "background-tint" + (custom_color === "rainbow" ? " rainbow" : "")
+              "background-tint" +
+              (page_custom_color === "rainbow" ? " rainbow" : "")
             }
           />
         )
@@ -126,7 +138,14 @@ let background_url = Astro.props.background_url
 
 <GlobalStyles />
 
-<style lang="scss" is:global define:vars={{ background_url, custom_color }}>
+<style
+  lang="scss"
+  is:global
+  define:vars={{
+    background_url: css_background_url,
+    custom_color: page_custom_color,
+  }}
+>
   body > .background {
     background-color: black;
     background-image: linear-gradient(
@@ -239,4 +258,4 @@ let background_url = Astro.props.background_url
   </style>
 </noscript>
 
-{custom_css && <style is:raw set:html={custom_css} />}
+{page_custom_css && <style is:raw set:html={page_custom_css} />}

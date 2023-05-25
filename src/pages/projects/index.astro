@@ -24,12 +24,7 @@ const projects = await Project.search({
 const pageCount = projects.pageCount;
 ---
 
-<Layout
-  id="projects"
-  title="Projetos"
-  profile={sessionProfile}
-  custom_color="rainbow"
->
+<Layout id="projects" title="Projetos" profile={sessionProfile}>
   <div class="container">
     <div class="box">
       <div class="top"></div>
@@ -44,10 +39,19 @@ const pageCount = projects.pageCount;
               projects.data?.map((project) => (
                 <div class="project">
                   <a class="project-link" href={`/projects/${project.id}`}>
-                    <img
-                      src={profilePicture(project.thumbnail_url)}
-                      alt={project.title}
-                    />
+                    <div class="thumbnail">
+                      <img
+                        src={profilePicture(project.thumbnail_url)}
+                        alt={project.title}
+                      />
+                      {project.nsfw && (
+                        <img
+                          class="crucificamente"
+                          src="/img/crucificamente.png"
+                          alt=""
+                        />
+                      )}
+                    </div>
                     <div class="info">
                       <h3 class="arial">{project.title}</h3>
                       <p class="arial">{project.type}</p>
@@ -196,17 +200,35 @@ const pageCount = projects.pageCount;
                   rgba(177, 177, 177, 0.5) 100%
                 );
 
+                &:hover {
+                  a.project-link .thumbnail .crucificamente {
+                    opacity: 0;
+                  }
+                }
+
                 a {
                   display: flex;
 
                   &.project-link {
                     width: 100%;
 
-                    img {
-                      width: 76px;
-                      height: 76px;
-                      object-fit: cover;
-                      object-position: center;
+                    .thumbnail {
+                      position: relative;
+
+                      img {
+                        width: 76px;
+                        height: 76px;
+                        object-fit: cover;
+                        object-position: center;
+                        display: block;
+                      }
+
+                      .crucificamente {
+                        position: absolute;
+                        top: 0;
+                        opacity: 1;
+                        transition: opacity 0.4s;
+                      }
                     }
 
                     .info {

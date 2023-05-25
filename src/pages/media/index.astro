@@ -34,12 +34,17 @@ const pageCount = media.pageCount;
               media.data?.map((project) => (
                 <div
                   class="media"
-                  style={`background-image: url("${
-                    project.nsfw
-                      ? "/img/crucificamente.png"
-                      : profilePicture(project.thumbnail_url)
-                  }")`}
+                  style={`background-image: url("${profilePicture(
+                    project.thumbnail_url
+                  )}")`}
                 >
+                  {project.nsfw && (
+                    <img
+                      class="crucificamente"
+                      src="/img/crucificamente.png"
+                      alt=""
+                    />
+                  )}
                   <div class="overlay">
                     <a href={`/projects/${project.id}`} class="project-link" />
                     <p class="title arial">{project.title}</p>
@@ -58,8 +63,14 @@ const pageCount = media.pageCount;
                   </div>
                   {project.type.includes("video") && (
                     <>
-                      <img class="play-gray" src="/img/sprites/play-gray.svg" />
-                      <img class="play-blue" src="/img/sprites/play-blue.svg" />
+                      <img
+                        class="play-icon gray"
+                        src="/img/sprites/play-gray.svg"
+                      />
+                      <img
+                        class="play-icon blue"
+                        src="/img/sprites/play-blue.svg"
+                      />
                     </>
                   )}
                 </div>
@@ -120,7 +131,7 @@ const pageCount = media.pageCount;
           background: url("/img/sprites/cramunhao-grid.png");
           padding: 0 16px 16px;
 
-          * {
+          > * {
             position: relative;
             z-index: 1;
           }
@@ -197,6 +208,22 @@ const pageCount = media.pageCount;
                       transform: translateY(0);
                     }
                   }
+
+                  .crucificamente {
+                    opacity: 0;
+                  }
+                }
+
+                .crucificamente {
+                  position: absolute;
+                  top: 0;
+                  right: 0;
+                  object-fit: cover;
+                  width: 100%;
+                  height: 100%;
+
+                  opacity: 1;
+                  transition: opacity 0.4s;
                 }
 
                 .overlay {
@@ -276,20 +303,23 @@ const pageCount = media.pageCount;
                   }
                 }
 
-                > img {
+                .play-icon {
                   pointer-events: none;
-                }
+                  z-index: 1;
 
-                .play-blue {
-                  display: none;
+                  &.blue {
+                    display: none;
+                  }
                 }
 
                 &:hover {
-                  .play-gray {
-                    display: none;
-                  }
-                  .play-blue {
-                    display: unset;
+                  .play-icon {
+                    &.gray {
+                      display: none;
+                    }
+                    &.blue {
+                      display: unset;
+                    }
                   }
                 }
               }

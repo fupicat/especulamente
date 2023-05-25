@@ -2,6 +2,12 @@ import { getCookie } from "@/lib/serverShorthand";
 import { getUser, server } from "@/lib/supabaseServer";
 import type { AstroGlobal } from "astro";
 
+export type SitePreferences = {
+  background_url?: string;
+  color?: string;
+  custom_css?: string;
+};
+
 export type ProfileData = {
   username: string;
   id: string;
@@ -13,6 +19,7 @@ export type ProfileData = {
   background_url: string | null;
   custom_css: string | null;
   color: string | null;
+  preferences: SitePreferences | null;
 };
 
 export type ProfileEditable = {
@@ -24,6 +31,7 @@ export type ProfileEditable = {
   background_url?: string | null;
   custom_css?: string | null;
   color?: string | null;
+  preferences: SitePreferences | null;
 };
 
 export default class Profile {
