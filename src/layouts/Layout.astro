@@ -28,12 +28,23 @@ const css_background_url = page_background_url
   ? `url("${page_background_url}")`
   : "";
 
+function escapeAngleBrackets(string: string | undefined): string | null {
+  if (!string) {
+    return null;
+  }
+  let escaped = string.replace(/</g, "&lt;");
+  escaped = escaped.replace(/>/g, "&gt;");
+  return escaped;
+}
+
 const page_custom_css =
-  Astro.props.custom_css || profile?.preferences?.custom_css || undefined;
+  escapeAngleBrackets(
+    Astro.props.custom_css || profile?.preferences?.custom_css
+  ) || undefined;
 ---
 
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -242,13 +253,5 @@ const page_custom_css =
     bottom: 6rem;
   }
 </style>
-
-<noscript>
-  <style>
-    .js-only {
-      display: none !important;
-    }
-  </style>
-</noscript>
 
 <style id="custom-css-style" is:inline set:html={page_custom_css || ""}></style>
