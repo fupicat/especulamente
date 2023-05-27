@@ -222,7 +222,7 @@ const backgroundOptions = [
     ) as HTMLStyleElement;
 
     cssPreviewButton.addEventListener("click", () => {
-      cssPreview.textContent = cssEditor.value;
+      cssPreview.innerHTML = cssEditor.value;
       cssPreview.disabled = false;
       cssCurrentStyle.disabled = true;
     });

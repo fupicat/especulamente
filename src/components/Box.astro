@@ -8,11 +8,11 @@ export interface Props {
 const { title, image, color } = Astro.props;
 ---
 
-<div class="page-box">
+<div class={"page-box" + (image ? " with-image" : "")}>
   <div class="top"></div>
   <div class="bottom">
     <div class="title-bar">
-      {image && <img src={image} alt={title} />}
+      {image && <img src={image} alt={title} title={title} />}
       <h2 class="hooge">&gt; {title}</h2>
     </div>
     <div class="inset">
@@ -30,6 +30,10 @@ const { title, image, color } = Astro.props;
     position: relative;
 
     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.25);
+
+    &.with-image {
+      margin-top: 36px;
+    }
 
     .top {
       height: 8px;

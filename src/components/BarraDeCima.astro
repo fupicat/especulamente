@@ -113,14 +113,17 @@ const { profile, custom_color } = Astro.props;
   const audioToggle =
     document.querySelector<HTMLAnchorElement>("#audio-toggle");
 
-  if (audioOff) audioToggle!.textContent = "off";
+  if (audioOff()) audioToggle!.textContent = "off";
 
   audioToggle!.addEventListener("click", (e) => {
     e.preventDefault();
-    if (audioOff) localStorage.removeItem("audio-off");
-    else localStorage.setItem("audio-off", "true");
-
-    window.location.reload();
+    if (audioOff()) {
+      localStorage.removeItem("audio-off");
+      audioToggle!.textContent = "on";
+    } else {
+      localStorage.setItem("audio-off", "true");
+      audioToggle!.textContent = "off";
+    }
   });
 </script>
 

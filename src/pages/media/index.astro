@@ -1,5 +1,6 @@
 ---
 import BarraDoLado from "@/components/BarraDoLado.astro";
+import Box from "@/components/Box.astro";
 import BuscaAvancada from "@/components/projects/BuscaAvancada.astro";
 import Pagination from "@/components/projects/Pagination.astro";
 import Layout from "@/layouts/Layout.astro";
@@ -21,71 +22,61 @@ const pageCount = media.pageCount;
 
 <Layout id="media" title="Mídia" profile={sessionProfile}>
   <div class="container">
-    <div class="box">
-      <div class="top"></div>
-      <div class="bottom">
-        <div class="title-bar">
-          <img src="/img/sprites/midia-grande.png" alt="Mídia" />
-          <h2 class="hooge">&gt; MÍDIA</h2>
-        </div>
-        <div class="inset">
-          <div class="grid">
-            {
-              media.data?.map((project) => (
-                <div
-                  class="media"
-                  style={`background-image: url("${profilePicture(
-                    project.thumbnail_url
-                  )}")`}
-                >
-                  {project.nsfw && (
-                    <img
-                      class="crucificamente"
-                      src="/img/crucificamente.png"
-                      alt=""
-                    />
-                  )}
-                  <div class="overlay">
-                    <a href={`/projects/${project.id}`} class="project-link" />
-                    <p class="title arial">{project.title}</p>
-                    <a href={`/users/${project.author.username}`} class="user">
-                      <img
-                        src={profilePicture(project.author.avatar_url)}
-                        alt={project.author.nickname}
-                      />
-                      <div class="info">
-                        <p class="time">
-                          {new Date(project.created_at).toLocaleString("pt-BR")}
-                        </p>
-                        <p class="nickname arial">{project.author.nickname}</p>
-                      </div>
-                    </a>
+    <Box title="MÍDIA" image="/img/sprites/midia-grande.png" color="#00BD2A">
+      <div class="grid">
+        {
+          media.data?.map((project) => (
+            <div
+              class="media"
+              style={`background-image: url("${profilePicture(
+                project.thumbnail_url
+              )}")`}
+            >
+              {project.nsfw && (
+                <img
+                  class="crucificamente"
+                  src="/img/crucificamente.png"
+                  alt=""
+                />
+              )}
+              <div class="overlay">
+                <a href={`/projects/${project.id}`} class="project-link" />
+                <p class="title arial">{project.title}</p>
+                <a href={`/users/${project.author.username}`} class="user">
+                  <img
+                    src={profilePicture(project.author.avatar_url)}
+                    alt={project.author.nickname}
+                  />
+                  <div class="info">
+                    <p class="time">
+                      {new Date(project.created_at).toLocaleString("pt-BR")}
+                    </p>
+                    <p class="nickname arial">{project.author.nickname}</p>
                   </div>
-                  {project.type.includes("video") && (
-                    <>
-                      <img
-                        class="play-icon gray"
-                        src="/img/sprites/play-gray.svg"
-                      />
-                      <img
-                        class="play-icon blue"
-                        src="/img/sprites/play-blue.svg"
-                      />
-                    </>
-                  )}
-                </div>
-              ))
-            }
-          </div>
-          <Pagination
-            currentPage={currentPage}
-            pageCount={pageCount}
-            url={Astro.url}
-          />
-        </div>
+                </a>
+              </div>
+              {project.type.includes("video") && (
+                <>
+                  <img
+                    class="play-icon gray"
+                    src="/img/sprites/play-gray.svg"
+                  />
+                  <img
+                    class="play-icon blue"
+                    src="/img/sprites/play-blue.svg"
+                  />
+                </>
+              )}
+            </div>
+          ))
+        }
       </div>
-      <div class="color" style="background-color: #00BD2A"></div>
-    </div>
+      <Pagination
+        currentPage={currentPage}
+        pageCount={pageCount}
+        url={Astro.url}
+      />
+    </Box>
     <BarraDoLado>
       <BuscaAvancada />
     </BarraDoLado>
@@ -101,235 +92,155 @@ const pageCount = media.pageCount;
       gap: 24px;
       align-items: flex-start;
 
-      > .box {
+      .grid {
         width: 100%;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        margin-top: 36px;
-        margin-bottom: 24px;
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        padding: 10px;
 
-        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.25);
+        .media {
+          display: flex;
+          align-items: center;
+          justify-content: center;
 
-        .top {
-          height: 8px;
-          image-rendering: pixelated;
-          background: url("/img/sprites/barra-do-lado-grid-topo.png");
-        }
+          aspect-ratio: 217 / 163;
 
-        .color {
-          position: absolute;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          mix-blend-mode: soft-light;
-        }
+          background-size: cover;
+          background-position: center;
+          image-rendering: auto;
 
-        .bottom {
-          image-rendering: pixelated;
-          background: url("/img/sprites/cramunhao-grid.png");
-          padding: 0 16px 16px;
+          position: relative;
 
-          > * {
-            position: relative;
-            z-index: 1;
-          }
+          &:hover {
+            .overlay {
+              opacity: 1;
 
-          .title-bar {
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
+              .title {
+                transform: translateY(0);
+              }
 
-            img {
-              width: 96px;
-              height: 96px;
-              object-fit: contain;
-              object-position: center;
-              image-rendering: auto;
-              margin-top: -60px;
-            }
-
-            h2 {
-              font-style: normal;
-              font-weight: 400;
-              font-size: 24px;
-              line-height: 27px;
-
-              color: #ffffff;
-              margin-bottom: 5px;
-            }
-          }
-
-          .inset {
-            width: 100%;
-            background: linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.5),
-                rgba(0, 0, 0, 0.5)
-              ),
-              url("/img/sprites/cramunhao-grid.png");
-            box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.35);
-            margin-top: 6px;
-
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-            .grid {
-              width: 100%;
-              display: grid;
-              gap: 10px;
-              grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-              padding: 10px;
-
-              .media {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-
-                aspect-ratio: 217 / 163;
-
-                background-size: cover;
-                background-position: center;
-                image-rendering: auto;
-
-                position: relative;
-
-                &:hover {
-                  .overlay {
-                    opacity: 1;
-
-                    .title {
-                      transform: translateY(0);
-                    }
-
-                    .user {
-                      transform: translateY(0);
-                    }
-                  }
-
-                  .crucificamente {
-                    opacity: 0;
-                  }
-                }
-
-                .crucificamente {
-                  position: absolute;
-                  top: 0;
-                  right: 0;
-                  object-fit: cover;
-                  width: 100%;
-                  height: 100%;
-
-                  opacity: 1;
-                  transition: opacity 0.4s;
-                }
-
-                .overlay {
-                  opacity: 0;
-                  position: absolute;
-                  top: 0;
-                  right: 0;
-                  bottom: 0;
-                  left: 0;
-                  background-color: rgba(0, 0, 0, 0.7);
-                  overflow: hidden;
-
-                  display: flex;
-                  flex-direction: column;
-                  justify-content: space-between;
-                  padding: 6px;
-
-                  transition: opacity 0.1s;
-
-                  .project-link {
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    bottom: 0;
-                    left: 0;
-                    display: block;
-                  }
-
-                  .title {
-                    font-style: normal;
-                    font-weight: 700;
-                    font-size: 14px;
-                    line-height: 16px;
-                    text-align: center;
-
-                    color: #ffffff;
-
-                    transform: translateY(-100%);
-                    transition: transform 0.2s
-                      cubic-bezier(0.33, 1.57, 0.62, 0.96);
-                  }
-
-                  .user {
-                    display: flex;
-                    gap: 6px;
-                    align-items: flex-end;
-                    width: fit-content;
-
-                    transform: translateY(100%);
-                    transition: transform 0.2s
-                      cubic-bezier(0.33, 1.57, 0.62, 0.96);
-
-                    img {
-                      width: 32px;
-                      height: 32px;
-                    }
-
-                    .info {
-                      .time {
-                        font-style: normal;
-                        font-weight: 400;
-                        font-size: 0.625rem;
-                        line-height: 0.6875rem;
-
-                        color: rgba(255, 255, 255, 0.4);
-                      }
-
-                      .nickname {
-                        font-style: normal;
-                        font-weight: 700;
-                        font-size: 12px;
-                        line-height: 14px;
-
-                        color: #ffffff;
-                      }
-                    }
-                  }
-                }
-
-                .play-icon {
-                  pointer-events: none;
-                  z-index: 1;
-
-                  &.blue {
-                    display: none;
-                  }
-                }
-
-                &:hover {
-                  .play-icon {
-                    &.gray {
-                      display: none;
-                    }
-                    &.blue {
-                      display: unset;
-                    }
-                  }
-                }
+              .user {
+                transform: translateY(0);
               }
             }
 
-            .pagination {
-              margin: 4px 0 14px;
+            .crucificamente {
+              opacity: 0;
+            }
+          }
+
+          .crucificamente {
+            position: absolute;
+            top: 0;
+            right: 0;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+
+            opacity: 1;
+            transition: opacity 0.4s;
+          }
+
+          .overlay {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 6px;
+
+            transition: opacity 0.1s;
+
+            .project-link {
+              position: absolute;
+              top: 0;
+              right: 0;
+              bottom: 0;
+              left: 0;
+              display: block;
+            }
+
+            .title {
+              font-style: normal;
+              font-weight: 700;
+              font-size: 14px;
+              line-height: 16px;
+              text-align: center;
+
+              color: #ffffff;
+
+              transform: translateY(-100%);
+              transition: transform 0.2s cubic-bezier(0.33, 1.57, 0.62, 0.96);
+            }
+
+            .user {
+              display: flex;
+              gap: 6px;
+              align-items: flex-end;
+              width: fit-content;
+
+              transform: translateY(100%);
+              transition: transform 0.2s cubic-bezier(0.33, 1.57, 0.62, 0.96);
+
+              img {
+                width: 32px;
+                height: 32px;
+              }
+
+              .info {
+                .time {
+                  font-style: normal;
+                  font-weight: 400;
+                  font-size: 0.625rem;
+                  line-height: 0.6875rem;
+
+                  color: rgba(255, 255, 255, 0.4);
+                }
+
+                .nickname {
+                  font-style: normal;
+                  font-weight: 700;
+                  font-size: 12px;
+                  line-height: 14px;
+
+                  color: #ffffff;
+                }
+              }
+            }
+          }
+
+          .play-icon {
+            pointer-events: none;
+            z-index: 1;
+
+            &.blue {
+              display: none;
+            }
+          }
+
+          &:hover {
+            .play-icon {
+              &.gray {
+                display: none;
+              }
+              &.blue {
+                display: unset;
+              }
             }
           }
         }
+      }
+
+      .pagination {
+        padding: 4px 0 14px;
       }
     }
   }
