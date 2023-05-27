@@ -41,7 +41,11 @@ const projects = await Project.search({ page: 1, perPage: 5 });
                 )}
                 <img
                   class="image"
-                  src={profilePicture(project.thumbnail_url)}
+                  src={
+                    project.nsfw
+                      ? "/img/crucificamente.png"
+                      : profilePicture(project.thumbnail_url)
+                  }
                   alt={project.title}
                 />
               </a>

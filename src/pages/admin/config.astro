@@ -1,0 +1,376 @@
+---
+import "@/lib/saving-progress/styles.scss";
+import "7.css/dist/7.scoped.css";
+
+import Layout from "@/layouts/Layout.astro";
+import Profile from "@/models/Profile";
+import LoginRequired from "@/layouts/LoginRequired.astro";
+import Box from "@/components/Box.astro";
+
+const sessionProfile = await Profile.current(Astro);
+
+if (!sessionProfile) {
+  Astro.response.status = 403;
+}
+
+const backgroundOptions = [
+  { name: "Padrão", value: "" },
+  { name: "Deserto", value: "/img/backgrounds/desert.png" },
+];
+---
+
+<LoginRequired profile={sessionProfile}>
+  <Layout
+    title="Configurações do site"
+    profile={sessionProfile}
+    id="config_page"
+  >
+    <div class="container">
+      <Box title="Configurações do site" color="#0c4895">
+        <form class="win7" data-user-id={sessionProfile?.id}>
+          <h2 class="hooge">Visual</h2>
+          <div class="field">
+            <label for="color" class="arial">Cor do cabeçalho</label>
+            <div class="side">
+              <select name="color" id="color">
+                <option
+                  value="default"
+                  selected={!sessionProfile?.preferences?.color}>Padrão</option
+                >
+                <option
+                  value="custom"
+                  selected={sessionProfile?.preferences?.color &&
+                    sessionProfile?.preferences?.color !== "rainbow"}
+                  >Escolher cor...</option
+                >
+                <option
+                  value="rainbow"
+                  selected={sessionProfile?.preferences?.color === "rainbow"}
+                  >🏳️‍🌈? 🤨</option
+                >
+              </select>
+              <input
+                type="color"
+                name="custom-color"
+                id="custom-color"
+                class={sessionProfile?.preferences?.color &&
+                sessionProfile?.preferences?.color !== "rainbow"
+                  ? ""
+                  : "hidden"}
+                value={sessionProfile?.preferences?.color || "#0046ff"}
+              />
+            </div>
+          </div>
+          <div class="field">
+            <label for="background" class="arial">Imagem de fundo</label>
+            <select name="background" id="background">
+              {
+                backgroundOptions.map(({ name, value }) => (
+                  <option
+                    value={value}
+                    selected={
+                      value === sessionProfile?.preferences?.background_url
+                    }
+                  >
+                    {name}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
+          <div
+            class="field"
+            title="Yea sem textinho colorido aqui. Use um editor externo e copie e cole."
+          >
+            <label for="css-editor" class="arial">CSS personalizado</label>
+            <textarea
+              name="css-editor"
+              id="css-editor"
+              cols="30"
+              rows="10"
+              set:text={sessionProfile?.preferences?.custom_css}
+            />
+            <div class="side">
+              <button type="button" id="css-preview">Pré-visualizar</button>
+              <button type="button" id="css-unpreview">DESprevisualizar</button>
+            </div>
+          </div>
+          <h2 class="hooge">Conta</h2>
+          <div class="field">
+            <label for="password-reset" class="arial">Recuperar senha</label>
+            <button type="button" id="password-reset"
+              >Enviar e-mail de recuperação de senha</button
+            >
+          </div>
+          <button type="submit"><p class="hooge">&gt; SALVAR &lt;</p></button>
+        </form>
+      </Box>
+    </div>
+  </Layout>
+
+  <script>
+    import {
+      removeSavingDialog,
+      showSavingDialog,
+    } from "@/lib/saving-progress";
+    import { supabase } from "@/lib/supabaseClient";
+    import type { ProfileEditable } from "@/models/Profile";
+
+    const form = document.querySelector("#config_page form") as HTMLFormElement;
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      onSubmit();
+    });
+
+    /* ================================= */
+    /* Pré-visualização de variáveis CSS */
+    /* ================================= */
+
+    const tempVisuals: any = {};
+    function updateSitePreview() {
+      for (const key in tempVisuals) {
+        if (Object.hasOwnProperty.call(tempVisuals, key)) {
+          const element = tempVisuals[key];
+          if (key === "rainbow") {
+            document.body.classList.toggle("rainbow", element);
+            continue;
+          }
+          document.body.style.setProperty(key, element || "");
+        }
+      }
+    }
+
+    /* ============== */
+    /* Seletor de cor */
+    /* ============== */
+
+    const colorSelect = form.querySelector("#color") as HTMLSelectElement;
+    const colorPicker = form.querySelector("#custom-color") as HTMLInputElement;
+
+    const colorSelectChanged = () => {
+      tempVisuals["rainbow"] = false;
+      if (colorSelect.value === "custom") {
+        colorPicker.classList.remove("hidden");
+        tempVisuals["--custom_color"] = colorPicker.value;
+      } else {
+        colorPicker.classList.add("hidden");
+        if (colorSelect.value === "rainbow") {
+          tempVisuals["rainbow"] = true;
+        } else {
+          tempVisuals["--custom_color"] = "initial";
+        }
+      }
+      if (tempVisuals["--background_url"] === "initial") {
+        tempVisuals["--bg_custom_color"] = tempVisuals["--custom_color"];
+      }
+      updateSitePreview();
+    };
+    colorSelect.addEventListener("change", colorSelectChanged);
+
+    colorPicker.addEventListener("input", () => {
+      tempVisuals["--custom_color"] = colorPicker.value;
+      if (tempVisuals["--background_url"] === "initial") {
+        tempVisuals["--bg_custom_color"] = colorPicker.value;
+      }
+      updateSitePreview();
+    });
+
+    /* ================ */
+    /* Seletor de fundo */
+    /* ================ */
+
+    const backgroundSelect = form.querySelector(
+      "#background"
+    ) as HTMLSelectElement;
+
+    const backgroundSelectChanged = () => {
+      if (backgroundSelect.value === "") {
+        tempVisuals["--background_url"] = "initial";
+        tempVisuals["--bg_custom_color"] = tempVisuals["--custom_color"];
+      } else {
+        tempVisuals["--background_url"] = `url('${backgroundSelect.value}')`;
+        tempVisuals["--bg_custom_color"] = "";
+      }
+      updateSitePreview();
+    };
+    backgroundSelect.addEventListener("change", backgroundSelectChanged);
+
+    /* ======================== */
+    /* Inicializador do preview */
+    /* ======================== */
+
+    backgroundSelectChanged();
+    colorSelectChanged();
+
+    /* ========================== */
+    /* Preview de CSS customizado */
+    /* ========================== */
+
+    const cssPreviewButton = form.querySelector(
+      "#css-preview"
+    ) as HTMLButtonElement;
+    const cssUnpreviewButton = form.querySelector(
+      "#css-unpreview"
+    ) as HTMLButtonElement;
+    const cssEditor = form.querySelector("#css-editor") as HTMLTextAreaElement;
+    const cssCurrentStyle = document.querySelector(
+      "#custom-css-style"
+    ) as HTMLStyleElement;
+    const cssPreview = document.querySelector(
+      "#custom-css-preview"
+    ) as HTMLStyleElement;
+
+    cssPreviewButton.addEventListener("click", () => {
+      cssPreview.textContent = cssEditor.value;
+      cssPreview.disabled = false;
+      cssCurrentStyle.disabled = true;
+    });
+
+    cssUnpreviewButton.addEventListener("click", () => {
+      cssPreview.disabled = true;
+      cssCurrentStyle.disabled = false;
+    });
+
+    /* ==================== */
+    /* Recuperação de senha */
+    /* ==================== */
+
+    const passwordReset = form.querySelector(
+      "#password-reset"
+    ) as HTMLButtonElement;
+
+    passwordReset.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const user = await supabase.auth.getUser();
+      if (user.error) {
+        alert("Você não está logado.");
+        return;
+      }
+
+      const email = user.data.user.email!;
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `https://especulamente.netlify.app/admin/recuperar-senha`,
+      });
+      if (error) {
+        alert(error.message);
+        return;
+      }
+      alert("Um e-mail foi enviado para redefinir sua senha!");
+    });
+
+    /* ================= */
+    /* Salvar alterações */
+    /* ================= */
+
+    async function onSubmit() {
+      let color = null;
+      if (colorSelect.value === "custom") {
+        color = colorPicker.value;
+      }
+      if (colorSelect.value === "rainbow") {
+        color = "rainbow";
+      }
+
+      showSavingDialog();
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          preferences: {
+            color,
+            background_url: backgroundSelect.value,
+            custom_css: cssEditor.value,
+          },
+        } as ProfileEditable)
+        .eq("id", form.dataset.userId);
+
+      if (error) {
+        alert(error.message);
+        removeSavingDialog();
+        return;
+      }
+
+      window.location.href = `/admin/config`;
+    }
+  </script>
+</LoginRequired>
+
+<style lang="scss" is:global>
+  #config_page .container {
+    padding-top: 26px;
+    padding-bottom: 26px;
+
+    .win7 {
+      button[type="submit"] {
+        all: unset;
+
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.15) 25%,
+          rgba(255, 255, 255, 0.3) 50%,
+          rgba(255, 255, 255, 0.15) 75%
+        );
+        background-position: center;
+        background-size: 100%;
+        text-align: center;
+        padding: 2px;
+        color: white;
+
+        cursor: pointer;
+
+        transition: background-size 0.1s;
+
+        &:hover {
+          background-size: 200%;
+        }
+
+        &:active {
+          opacity: 0.7;
+        }
+      }
+    }
+
+    form {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      h2 {
+        margin: 0;
+        color: white;
+        font-size: 24px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        width: fit-content;
+
+        .hidden {
+          display: none;
+        }
+
+        label {
+          color: white;
+        }
+
+        .side {
+          display: flex;
+          gap: 6px;
+        }
+
+        input[type="color"] {
+          height: 22px;
+          width: 22px;
+        }
+      }
+    }
+  }
+</style>
+
+<style id="custom-css-preview" is:inline></style>

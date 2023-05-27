@@ -17,7 +17,7 @@ export interface Props {
 const { title, profile, id, edit_url } = Astro.props;
 
 const page_custom_color =
-  Astro.props.custom_color || profile?.preferences?.color || undefined;
+  Astro.props.custom_color || profile?.preferences?.color || "none";
 
 const page_background_url =
   Astro.props.background_url ||
@@ -26,7 +26,7 @@ const page_background_url =
 
 const css_background_url = page_background_url
   ? `url("${page_background_url}")`
-  : "url('/img/backgrounds/default.png')";
+  : "";
 
 const page_custom_css =
   Astro.props.custom_css || profile?.preferences?.custom_css || undefined;
@@ -47,19 +47,15 @@ const page_custom_css =
       }
     </title>
   </head>
-  <body>
+  <body class={page_custom_color === "rainbow" ? "rainbow" : ""}>
     <BarraDeCima profile={profile} custom_color={page_custom_color} />
     <div class="background">
-      {
-        !page_background_url && page_custom_color && (
-          <div
-            class={
-              "background-tint" +
-              (page_custom_color === "rainbow" ? " rainbow" : "")
-            }
-          />
-        )
-      }
+      <div
+        style="--custom_color: var(--bg_custom_color)"
+        class={"background-tint" +
+          (page_custom_color === "rainbow" ? " rainbow" : "")}
+      >
+      </div>
       <main id={id}>
         <slot />
       </main>
@@ -144,6 +140,7 @@ const page_custom_css =
   define:vars={{
     background_url: css_background_url,
     custom_color: page_custom_color,
+    bg_custom_color: page_background_url ? "none" : page_custom_color,
   }}
 >
   body > .background {
@@ -155,7 +152,7 @@ const page_custom_css =
         rgba(0, 0, 0, 0) 95%,
         rgb(0, 0, 0) 100%
       ),
-      var(--background_url);
+      var(--background_url, url("/img/backgrounds/default.png"));
     background-repeat: repeat-y;
     background-position: top center;
     background-size: 2048px;
@@ -169,10 +166,6 @@ const page_custom_css =
       height: 100%;
       background-color: var(--custom_color);
       mix-blend-mode: hue;
-
-      &.rainbow {
-        animation: bg-rainbow-cycle 5s linear infinite;
-      }
     }
 
     > main {
@@ -258,4 +251,4 @@ const page_custom_css =
   </style>
 </noscript>
 
-{page_custom_css && <style is:raw set:html={page_custom_css} />}
+<style id="custom-css-style" is:inline set:text={page_custom_css || ""}></style>

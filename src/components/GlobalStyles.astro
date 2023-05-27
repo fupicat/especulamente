@@ -80,6 +80,13 @@
 
   /* Animations */
 
+  .rainbow {
+    .background-tint,
+    .header-tint {
+      animation: bg-rainbow-cycle 5s linear infinite;
+    }
+  }
+
   @keyframes bg-rainbow-cycle {
     0% {
       background-color: #ff0000;

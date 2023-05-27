@@ -11,19 +11,14 @@
     "astro": "astro"
   },
   "dependencies": {
-    "7.css": "^0.13.0",
     "@astrojs/netlify": "^2.1.2",
-    "@ffmpeg/core": "^0.11.0",
-    "@ffmpeg/ffmpeg": "^0.11.6",
     "@supabase/supabase-js": "^2.4.0",
     "@types/marked": "^4.0.8",
+    "7.css": "^0.13.0",
     "astro": "^2.0.7",
-    "easymde": "^2.18.0",
     "gsap": "^3.11.4",
     "marked": "^4.2.12",
-    "node-fetch": "^3.3.0",
-    "sanitize-html": "^2.8.1",
-    "svelte": "^3.46.4"
+    "sanitize-html": "^2.8.1"
   },
   "devDependencies": {
     "sass": "^1.57.1"

@@ -11,13 +11,8 @@ const { profile, custom_color } = Astro.props;
 
 <header id="barra-de-cima">
   <div class="top">
-    {
-      custom_color && (
-        <div
-          class={"header-tint" + (custom_color === "rainbow" ? " rainbow" : "")}
-        />
-      )
-    }
+    <div class={"header-tint" + (custom_color === "rainbow" ? " rainbow" : "")}>
+    </div>
     <div class="container">
       <h1>especulamente.com.br</h1>
       <a href="/" class="logo">
@@ -89,7 +84,7 @@ const { profile, custom_color } = Astro.props;
                 <a href={`/users/${profile.username}`}>
                   {profile.nickname || "nova conta"}
                 </a>
-                ~ <a href="/admin/editar/conta">configurações</a> ~
+                ~ <a href="/admin/config">configurações</a> ~
                 <a href="/" id="logout">
                   sair
                 </a>
@@ -105,13 +100,8 @@ const { profile, custom_color } = Astro.props;
     </div>
   </div>
   <div class="bottom">
-    {
-      custom_color && (
-        <div
-          class={"header-tint" + (custom_color === "rainbow" ? " rainbow" : "")}
-        />
-      )
-    }
+    <div class={"header-tint" + (custom_color === "rainbow" ? " rainbow" : "")}>
+    </div>
   </div>
 </header>
 
@@ -236,10 +226,6 @@ const { profile, custom_color } = Astro.props;
       mix-blend-mode: hue;
       z-index: 1;
       pointer-events: none;
-
-      &.rainbow {
-        animation: bg-rainbow-cycle 5s linear infinite;
-      }
     }
 
     .top {

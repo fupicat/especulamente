@@ -1,10 +1,11 @@
 ---
 import "@/lib/saving-progress/styles.scss";
+import "7.css/dist/7.scoped.css";
 
 import Layout from "@/layouts/Layout.astro";
-import { profilePicture } from "@/lib/clientShorthand";
 import Profile from "@/models/Profile";
 import LoginRequired from "@/layouts/LoginRequired.astro";
+import Box from "@/components/Box.astro";
 
 const sessionProfile = await Profile.current(Astro);
 
@@ -15,45 +16,53 @@ if (!sessionProfile) {
 
 <LoginRequired profile={sessionProfile}>
   <Layout
-    title={`Editando conta ${sessionProfile?.nickname}`}
+    title="Configurações do site"
     profile={sessionProfile}
-    id="editar_conta"
+    id="config_page"
   >
-    <form class="win7">
-      <label for="username">Nome de usuário</label>
-      <input
-        type="text"
-        id="username"
-        name="username"
-        pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
-        value={sessionProfile?.username}
-      />
-      <label for="nickname">Apelido</label>
-      <input
-        type="text"
-        id="nickname"
-        name="nickname"
-        value={sessionProfile?.nickname}
-      />
-      <label for="bio">Sobre mim</label>
-      <textarea
-        class="bio"
-        id="bio"
-        name="bio"
-        set:text={sessionProfile?.bio}
-      />
-      <label for="avatar">Avatar</label>
-      <img
-        id="avatar_img"
-        src={profilePicture(sessionProfile?.avatar_url)}
-        alt={`Foto de perfil de ${sessionProfile?.username}`}
-        width="200"
-        height="200"
-      />
-      <input type="file" accept="image/*" name="avatar" id="avatar" />
-      <button id="password-reset">Enviar e-mail de recuperação de senha</button>
-      <button type="submit">salvar</button>
-    </form>
+    <div class="container">
+      <Box title="Configurações do site" color="#0c4895">
+        <form class="win7">
+          <div class="field">
+            <label for="color" class="arial">Cor do cabeçalho</label>
+            <div class="side">
+              <select name="color" id="color">
+                <option
+                  value="default"
+                  selected={!sessionProfile?.preferences?.color}>Padrão</option
+                >
+                <option
+                  value="custom"
+                  selected={sessionProfile?.preferences?.color &&
+                    sessionProfile?.preferences?.color !== "rainbow"}
+                  >Escolher cor...</option
+                >
+                <option
+                  value="rainbow"
+                  selected={sessionProfile?.preferences?.color === "rainbow"}
+                  >🏳️‍🌈? 🤨</option
+                >
+              </select>
+              <input
+                type="color"
+                name="custom-color"
+                id="custom-color"
+                class={sessionProfile?.preferences?.color &&
+                sessionProfile?.preferences?.color !== "rainbow"
+                  ? ""
+                  : "hidden"}
+                value={sessionProfile?.preferences?.color || "#000000"}
+              />
+            </div>
+            <button type="button">Pré-visualizar</button>
+          </div>
+          <div class="field">
+            <label for="password-reset" class="arial">Recuperar senha</label>
+            <button type="button">Enviar e-mail de recuperação de senha</button>
+          </div>
+        </form>
+      </Box>
+    </div>
   </Layout>
 
   <script>
@@ -132,3 +141,42 @@ if (!sessionProfile) {
     }
   </script>
 </LoginRequired>
+
+<style lang="scss" is:global>
+  #config_page .container {
+    padding-top: 26px;
+    padding-bottom: 26px;
+
+    form {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+
+        .hidden {
+          display: none;
+        }
+
+        label {
+          color: white;
+        }
+
+        .side {
+          display: flex;
+          gap: 6px;
+        }
+
+        input[type="color"] {
+          height: 22px;
+          width: 22px;
+        }
+      }
+    }
+  }
+</style>
