@@ -80,9 +80,14 @@
 
   /* Animations */
 
+  .color-tint {
+    background-color: var(--custom_color);
+    mix-blend-mode: hue;
+    pointer-events: none;
+  }
+
   .rainbow {
-    .background-tint,
-    .header-tint {
+    .color-tint {
       animation: bg-rainbow-cycle 5s linear infinite;
     }
   }

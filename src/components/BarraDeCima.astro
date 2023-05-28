@@ -11,7 +11,10 @@ const { profile, custom_color } = Astro.props;
 
 <header id="barra-de-cima">
   <div class="top">
-    <div class={"header-tint" + (custom_color === "rainbow" ? " rainbow" : "")}>
+    <div
+      class={"header-tint color-tint" +
+        (custom_color === "rainbow" ? " rainbow" : "")}
+    >
     </div>
     <div class="container">
       <h1>especulamente.com.br</h1>
@@ -100,7 +103,10 @@ const { profile, custom_color } = Astro.props;
     </div>
   </div>
   <div class="bottom">
-    <div class={"header-tint" + (custom_color === "rainbow" ? " rainbow" : "")}>
+    <div
+      class={"header-tint color-tint" +
+        (custom_color === "rainbow" ? " rainbow" : "")}
+    >
     </div>
   </div>
 </header>
@@ -225,8 +231,6 @@ const { profile, custom_color } = Astro.props;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: var(--custom_color);
-      mix-blend-mode: hue;
       z-index: 1;
       pointer-events: none;
     }

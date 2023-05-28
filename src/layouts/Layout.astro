@@ -3,6 +3,7 @@ import GlobalStyles from "@/components/GlobalStyles.astro";
 import BarraDeCima from "@/components/BarraDeCima.astro";
 import type { ProfileData } from "@/models/Profile";
 import BarraDeBaixo from "@/components/BarraDeBaixo.astro";
+import { escapeAngleBrackets } from "@/lib/escapeAngleBrackets";
 
 export interface Props {
   title?: string;
@@ -27,15 +28,6 @@ const page_background_url =
 const css_background_url = page_background_url
   ? `url("${page_background_url}")`
   : "";
-
-function escapeAngleBrackets(string: string | undefined): string | null {
-  if (!string) {
-    return null;
-  }
-  let escaped = string.replace(/</g, "&lt;");
-  escaped = escaped.replace(/>/g, "&gt;");
-  return escaped;
-}
 
 const page_custom_css =
   escapeAngleBrackets(
@@ -63,7 +55,7 @@ const page_custom_css =
     <div class="background">
       <div
         style="--custom_color: var(--bg_custom_color)"
-        class={"background-tint" +
+        class={"background-tint color-tint" +
           (page_custom_color === "rainbow" ? " rainbow" : "")}
       >
       </div>
@@ -175,8 +167,6 @@ const page_custom_css =
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: var(--custom_color);
-      mix-blend-mode: hue;
     }
 
     > main {

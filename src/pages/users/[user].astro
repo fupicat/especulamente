@@ -1,8 +1,11 @@
 ---
+import BarraDoLado from "@/components/BarraDoLado.astro";
+import Box from "@/components/Box.astro";
 import Layout from "@/layouts/Layout.astro";
 import PageExists from "@/layouts/PageExists.astro";
 import { profilePicture } from "@/lib/clientShorthand";
 import Profile from "@/models/Profile";
+import { escapeAngleBrackets } from "@/lib/escapeAngleBrackets";
 
 import { marked } from "marked";
 
@@ -17,24 +20,166 @@ if (!profile) {
 
 <PageExists profile={sessionProfile} exists={!!profile}>
   <Layout
+    id="profile-page"
     title={profile?.nickname}
     profile={sessionProfile}
     edit_url={profile?.username === sessionProfile?.username
       ? "/admin/editar/conta"
       : undefined}
+    background_url={profile?.background_url || undefined}
+    custom_color={profile?.color || undefined}
+    custom_css={profile?.custom_css || undefined}
   >
-    <div class="profile">
-      <h1>{profile?.username}</h1>
-      <div class="bio" set:html={marked.parse(profile?.bio || "")} />
-      <img
-        src={profilePicture(profile?.avatar_url)}
-        alt={`Foto de perfil de ${profile?.username}`}
-        width="200"
-        height="200"
-      />
-      <p class="date">
-        {new Date(profile?.created_at || "").toLocaleString("pt")}
-      </p>
+    <div class="container">
+      <div class="profile">
+        <div class="banner">
+          <div class="color-tint"></div>
+          <img
+            class="banner-image"
+            src={profile?.banner_url || "/img/default-banner.png"}
+            alt={`Banner de ${profile?.nickname}`}
+          />
+          <div class="pfp">
+            <div class="color-tint"></div>
+            <img
+              class="pfp-image"
+              src={profilePicture(profile?.avatar_url)}
+              alt={`Foto de ${profile?.nickname}`}
+            />
+          </div>
+          <div class="name">
+            <p class="hooge">
+              {profile?.nickname}
+              <span class="gray">@{profile?.username}</span>
+            </p>
+          </div>
+        </div>
+        <Box title="Sobre mim" additionalClass="first-box" compact>
+          <article
+            class="about-me underline"
+            set:html={marked.parse(escapeAngleBrackets(profile?.bio) || "")}
+          />
+        </Box>
+      </div>
+      <BarraDoLado />
     </div>
   </Layout>
 </PageExists>
+
+<style lang="scss" is:global>
+  #profile-page .container {
+    padding-top: 26px;
+    padding-bottom: 36px;
+    display: flex;
+    gap: 16px;
+
+    .profile {
+      width: 100%;
+
+      .banner {
+        padding: 6px;
+        background-image: url("/img/sprites/cramunhao-grid.png");
+        box-shadow: inset 0 0 0 2px #00000021, 0 2px 6px #0000006e;
+        image-rendering: pixelated;
+        position: relative;
+
+        .color-tint {
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          width: 100%;
+          height: 100%;
+          mix-blend-mode: overlay;
+        }
+
+        .banner-image {
+          image-rendering: auto;
+          display: block;
+          width: 100%;
+          height: 166px;
+          box-shadow: 0 0 0 2px #ffffff21;
+          object-fit: cover;
+          object-position: center;
+          position: relative;
+        }
+
+        .pfp {
+          position: absolute;
+          bottom: -18px;
+          left: 12px;
+          background-image: url("/img/sprites/cramunhao-grid.png");
+          padding: 6px;
+          box-shadow: 0 2px 6px #0000006e;
+
+          .pfp-image {
+            image-rendering: auto;
+            width: 150px;
+            height: 150px;
+            display: block;
+            box-shadow: 0 0 0 4px #ffffff21;
+            position: relative;
+          }
+        }
+
+        .name {
+          margin-left: 172px;
+          position: relative;
+          background-color: #0000006e;
+          margin-top: 6px;
+          image-rendering: auto;
+
+          p {
+            font-size: 22px;
+            padding: 0 6px 6px 6px;
+            color: white;
+
+            .gray {
+              color: #ffffff75;
+              font-size: 12px;
+            }
+          }
+        }
+      }
+
+      .page-box {
+        margin-top: 18px;
+
+        &.first-box {
+          margin-top: 32px;
+        }
+
+        .about-me {
+          color: white;
+          font-family: Arial, sans-serif;
+          padding: 4px 8px;
+          word-wrap: break-word;
+          line-height: 120%;
+          max-height: 240px;
+          overflow: auto;
+
+          p {
+            margin: 6px 0;
+          }
+
+          a {
+            color: #6cb2ff;
+          }
+
+          h1,
+          h2,
+          h3,
+          h4,
+          h5,
+          h6 {
+            line-height: 140%;
+            font-family: "Hooge", monospace;
+          }
+
+          img {
+            max-width: 100%;
+          }
+        }
+      }
+    }
+  }
+</style>
