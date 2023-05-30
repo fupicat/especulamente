@@ -77,22 +77,26 @@ if (profile) {
             set:html={marked.parse(escapeAngleBrackets(profile?.bio) || "")}
           />
         </Box>
-        <Box title="Projetos" compact>
-          <div class="list">
-            {
-              projects?.data?.map((project) => (
-                <ProjetoListado project={project} />
-              ))
-            }
-          </div>
-          <div class="more arial underline">
-            <a href={`/projects?authors=${profile?.username}`}>Ver mais +</a>
-          </div>
-        </Box>
+        {
+          projects && projects.data.length > 0 && (
+            <Box title="Projetos" compact>
+              <div class="list">
+                {projects.data.map((project) => (
+                  <ProjetoListado project={project} />
+                ))}
+              </div>
+              <div class="more arial underline">
+                <a href={`/projects?authors=${profile?.username}`}>
+                  Ver mais +
+                </a>
+              </div>
+            </Box>
+          )
+        }
       </div>
       <BarraDoLado>
         {
-          featuredProjects && featuredProjects?.length > 0 && (
+          featuredProjects && featuredProjects.length > 0 && (
             <>
               <div class="header">
                 <p>em destaque</p>
