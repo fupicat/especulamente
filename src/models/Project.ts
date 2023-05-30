@@ -54,19 +54,6 @@ export default class Project {
     return (data as ProjectData) || null;
   }
 
-  static async all(): Promise<ProjectData[]> {
-    if (!server) return this.placeholders;
-
-    const { data, error } = await server
-      .from("projects")
-      .select("*, author (*)")
-      .order("created_at", { ascending: false });
-
-    if (error) throw error;
-
-    return data as ProjectData[];
-  }
-
   static async search({
     query = "",
     page = 0,
@@ -123,6 +110,42 @@ export default class Project {
     if (error) throw error;
 
     return { data: data as ProjectData[], pageCount };
+  }
+
+  /**
+   * Returns a list of featured projects based on the provided username (if any).
+   * If no username is provided, returns all featured projects.
+   *
+   * @param {string} by - (Optional) The username of the user whose featured projects to retrieve.
+   * @return {Promise<ProjectData[]>} A promise that resolves to an array of ProjectData objects representing the featured projects.
+   * @throws {Error} If there is an error retrieving the data from the server.
+   */
+  static async featured(by: string = ""): Promise<ProjectData[]> {
+    if (!server) return [];
+    if (by) {
+      const { data, error } = await server
+        .from("featured_projects")
+        .select("*, featured_by!inner (username), project (*, author (*))")
+        .eq("featured_by.username", by)
+        .order("created_at", {
+          ascending: false,
+        });
+
+      if (error) throw error;
+
+      return data.map((m) => m.project) as ProjectData[];
+    }
+
+    const { data, error } = await server
+      .from("featured_projects")
+      .select("*, featured_by!inner (username), project (*, author (*))")
+      .order("created_at", {
+        ascending: false,
+      });
+
+    if (error) throw error;
+
+    return data.map((m) => m.project) as ProjectData[];
   }
 
   static async put(

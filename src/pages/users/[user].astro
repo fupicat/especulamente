@@ -8,6 +8,9 @@ import Profile from "@/models/Profile";
 import { escapeAngleBrackets } from "@/lib/escapeAngleBrackets";
 
 import { marked } from "marked";
+import Project, { ProjectData } from "@/models/Project";
+import ProjetoListado from "@/components/projects/ProjetoListado.astro";
+import ProjetoEngradado from "@/components/projects/ProjetoEngradado.astro";
 
 const sessionProfile = await Profile.current(Astro);
 
@@ -15,6 +18,20 @@ const profile = await Profile.get({ username: Astro.params.user });
 
 if (!profile) {
   Astro.response.status = 404;
+}
+
+let projects: { data: ProjectData[]; pageCount: number } | null = null;
+if (profile) {
+  projects = await Project.search({
+    authors: [profile.username],
+    perPage: 6,
+    page: 1,
+  });
+}
+
+let featuredProjects: ProjectData[] | null = null;
+if (profile) {
+  featuredProjects = await Project.featured(profile.username);
 }
 ---
 
@@ -60,8 +77,35 @@ if (!profile) {
             set:html={marked.parse(escapeAngleBrackets(profile?.bio) || "")}
           />
         </Box>
+        <Box title="Projetos" compact>
+          <div class="list">
+            {
+              projects?.data?.map((project) => (
+                <ProjetoListado project={project} />
+              ))
+            }
+          </div>
+          <div class="more arial underline">
+            <a href={`/projects?authors=${profile?.username}`}>Ver mais +</a>
+          </div>
+        </Box>
       </div>
-      <BarraDoLado />
+      <BarraDoLado>
+        {
+          featuredProjects && featuredProjects?.length > 0 && (
+            <>
+              <div class="header">
+                <p>em destaque</p>
+              </div>
+              <div class="featured-projects">
+                {featuredProjects.map((project) => (
+                  <ProjetoEngradado project={project} />
+                ))}
+              </div>
+            </>
+          )
+        }
+      </BarraDoLado>
     </div>
   </Layout>
 </PageExists>
@@ -179,7 +223,25 @@ if (!profile) {
             max-width: 100%;
           }
         }
+
+        .list {
+          padding: 10px;
+        }
+
+        .more {
+          padding: 4px 0 14px;
+          text-align: center;
+          font-style: italic;
+
+          a {
+            color: #6cb2ff;
+          }
+        }
       }
+    }
+
+    .featured-projects {
+      margin-top: 8px;
     }
   }
 </style>

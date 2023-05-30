@@ -3,6 +3,7 @@ import BarraDoLado from "@/components/BarraDoLado.astro";
 import Box from "@/components/Box.astro";
 import BuscaAvancada from "@/components/projects/BuscaAvancada.astro";
 import Pagination from "@/components/projects/Pagination.astro";
+import ProjetoListado from "@/components/projects/ProjetoListado.astro";
 import Layout from "@/layouts/Layout.astro";
 import { profilePicture } from "@/lib/clientShorthand";
 import Profile from "@/models/Profile";
@@ -29,51 +30,7 @@ const pageCount = projects.pageCount;
   <div class="container">
     <Box title="PROJETOS" image="/img/sprites/projetos-grande.png">
       <div class="list">
-        {
-          projects.data?.map((project) => (
-            <div class="project">
-              <a class="project-link" href={`/projects/${project.id}`}>
-                <div class="thumbnail">
-                  <img
-                    src={profilePicture(project.thumbnail_url)}
-                    alt={project.title}
-                  />
-                  {project.nsfw && (
-                    <img
-                      class="crucificamente"
-                      src="/img/crucificamente.png"
-                      alt=""
-                    />
-                  )}
-                </div>
-                <div class="info">
-                  <h3 class="arial">{project.title}</h3>
-                  <p class="arial">{project.type}</p>
-                  {project.tags && (
-                    <p class="arial">Tags: {project.tags?.join(", ")}</p>
-                  )}
-                </div>
-              </a>
-              <a
-                class="profile-link"
-                href={`/users/${project.author.username}`}
-              >
-                <div class="info">
-                  <p class="nickname arial">{project.author.nickname}</p>
-                  <p class="date">
-                    {new Date(project.created_at).toLocaleDateString("pt-BR")}
-                  </p>
-                </div>
-                <div class="avatar">
-                  <img
-                    src={profilePicture(project.author.avatar_url)}
-                    alt={`Foto de perfil de ${project.author.nickname}`}
-                  />
-                </div>
-              </a>
-            </div>
-          ))
-        }
+        {projects.data?.map((project) => <ProjetoListado project={project} />)}
       </div>
       <Pagination
         currentPage={currentPage}
@@ -102,114 +59,6 @@ const pageCount = projects.pageCount;
         gap: 0px;
         flex-direction: column;
         padding: 10px;
-
-        .project {
-          image-rendering: auto;
-          display: flex;
-          justify-content: space-between;
-          gap: 32px;
-          background: linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.5) 0%,
-            rgba(205, 205, 205, 0.5) 10%,
-            rgba(177, 177, 177, 0.5) 100%
-          );
-
-          &:hover {
-            a.project-link .thumbnail .crucificamente {
-              opacity: 0;
-            }
-          }
-
-          a {
-            display: flex;
-
-            &.project-link {
-              width: 100%;
-
-              .thumbnail {
-                position: relative;
-
-                img {
-                  width: 76px;
-                  height: 76px;
-                  object-fit: cover;
-                  object-position: center;
-                  display: block;
-                }
-
-                .crucificamente {
-                  position: absolute;
-                  top: 0;
-                  opacity: 1;
-                  transition: opacity 0.4s;
-                }
-              }
-
-              .info {
-                padding: 8px;
-                color: white;
-                font-size: 12px;
-
-                h3 {
-                  font-weight: bold;
-                  font-size: 16px;
-                }
-
-                p {
-                  opacity: 0.5;
-                }
-              }
-            }
-
-            &.profile-link {
-              background-color: #0000004d;
-
-              &:hover {
-                .info {
-                  width: 112px;
-                  padding-left: 8px;
-                }
-              }
-
-              .info {
-                padding: 8px;
-                padding-right: 0;
-                color: white;
-                display: flex;
-                flex-direction: column;
-                align-items: flex-end;
-                justify-content: end;
-
-                width: 0px;
-                padding-left: 0;
-                overflow: hidden;
-
-                transition: width 0.1s ease-out, padding-left 0.1s ease-out;
-
-                .nickname {
-                  font-weight: bold;
-                }
-
-                .date {
-                  opacity: 0.5;
-                  font-size: 12px;
-                }
-              }
-
-              .avatar {
-                width: 76px;
-                height: 76px;
-                padding: 8px;
-
-                img {
-                  width: 100%;
-                  height: 100%;
-                }
-              }
-            }
-          }
-        }
       }
 
       .pagination {
