@@ -1,7 +1,7 @@
 export function getCookie(request: Request, name: string) {
   return (
     (request.headers.get("Cookie") as string)
-      .match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)")
+      ?.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)")
       ?.pop() || null
   );
 }

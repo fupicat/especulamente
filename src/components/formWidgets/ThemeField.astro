@@ -1,0 +1,100 @@
+---
+import "7.css/dist/7.scoped.css";
+
+export interface Props {
+  value?: string | null;
+  id?: string;
+  label: string;
+}
+
+const { value, id, label } = Astro.props;
+---
+
+<theme-field id={id} data-value={value || undefined} class="win7">
+  <label class="arial">{label}</label>
+  <div class="side">
+    <select>
+      <option value="default" selected={!value}>Padrão</option>
+      <option value="custom" selected={value && value !== "rainbow"}
+        >Escolher cor...</option
+      >
+      <option value="rainbow" selected={value === "rainbow"}>🏳️‍🌈? 🤨</option>
+    </select>
+    <input
+      type="color"
+      class={value && value !== "rainbow" ? "" : "hidden"}
+      value={value || "#0046ff"}
+    />
+  </div>
+</theme-field>
+
+<script>
+  class ThemeField extends HTMLElement {
+    constructor() {
+      super();
+
+      const select = this.querySelector("select") as HTMLSelectElement;
+      const colorPicker = this.querySelector(
+        "input[type=color]"
+      ) as HTMLInputElement;
+
+      const colorSelectChanged = () => {
+        let customColor = "";
+
+        if (select.value === "custom") {
+          colorPicker.classList.remove("hidden");
+          customColor = colorPicker.value;
+        } else {
+          colorPicker.classList.add("hidden");
+          if (select.value === "rainbow") {
+            customColor = "rainbow";
+          } else {
+            customColor = "";
+          }
+        }
+
+        this.dataset.value = customColor;
+      };
+
+      select.addEventListener("change", () => {
+        colorSelectChanged();
+      });
+
+      colorPicker.addEventListener("input", () => {
+        this.dataset.value = colorPicker.value;
+      });
+
+      colorSelectChanged();
+    }
+  }
+
+  customElements.define("theme-field", ThemeField);
+</script>
+
+<style lang="scss" is:global>
+  theme-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: fit-content;
+
+    .hidden {
+      display: none;
+    }
+
+    label {
+      color: white;
+    }
+
+    .side {
+      display: flex;
+      gap: 6px;
+    }
+
+    input[type="color"] {
+      height: 22px;
+      width: 22px;
+    }
+  }
+</style>

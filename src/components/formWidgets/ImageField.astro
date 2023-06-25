@@ -1,0 +1,94 @@
+---
+export interface Props {
+  value?: string | null;
+  defaultImage?: string | null;
+  id?: string;
+  label?: string;
+  width?: string;
+  height?: string;
+}
+
+const {
+  value,
+  defaultImage = "/img/sprites/image-upload.png",
+  id,
+  label,
+  width = "64px",
+  height = "64px",
+} = Astro.props;
+---
+
+<image-field id={id} data-value={value || undefined}>
+  {label && <label class="arial">{label}</label>}
+  <button type="button" role="button">
+    <img
+      src={value || defaultImage}
+      alt=""
+      style={`width: ${width}; height: ${height}`}
+    />
+    <p>Upload</p>
+  </button>
+  <input type="file" accept="image/*" />
+</image-field>
+
+<script>
+  class ImageField extends HTMLElement {
+    constructor() {
+      super();
+
+      const button = this.querySelector("button") as HTMLButtonElement;
+      const fileInput = this.querySelector(
+        "input[type='file']"
+      ) as HTMLInputElement;
+      const preview = this.querySelector("img") as HTMLImageElement;
+
+      button.addEventListener("click", (e) => {
+        e.preventDefault();
+        fileInput.click();
+      });
+
+      fileInput.addEventListener("change", () => {
+        if (this.dataset.value) {
+          URL.revokeObjectURL(this.dataset.value);
+        }
+
+        const file = fileInput.files?.[0] as File;
+
+        const url = URL.createObjectURL(file);
+        preview.src = url;
+
+        this.dataset.value = url;
+      });
+    }
+  }
+
+  customElements.define("image-field", ImageField);
+</script>
+
+<style lang="scss" is:global>
+  image-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: fit-content;
+
+    label {
+      color: white;
+    }
+
+    button {
+      padding: 6px !important;
+
+      img {
+        background-color: black;
+        object-fit: scale-down;
+        object-position: center;
+      }
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+  }
+</style>

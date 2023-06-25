@@ -1,0 +1,95 @@
+---
+import ImageField from "./ImageField.astro";
+export interface Props {
+  value?: string | null;
+  id?: string;
+  label: string;
+}
+
+const { value, id, label } = Astro.props;
+
+const backgroundOptions = [
+  { name: "Padrão", value: "" },
+  { name: "Deserto", value: "/img/backgrounds/desert.png" },
+  { name: "Custom...", value: "custom" },
+];
+
+const isCustomSelected = !backgroundOptions.some((o) => o.value === value);
+---
+
+<background-field id={id} data-value={value || undefined}>
+  <label class="arial">{label}</label>
+  <select>
+    {
+      backgroundOptions.map((option) => (
+        <option
+          value={option.value}
+          selected={
+            option.value === value ||
+            (isCustomSelected && option.value === "custom")
+          }
+        >
+          {option.name}
+        </option>
+      ))
+    }
+  </select>
+  <div class="custom" class:list={{ hidden: !isCustomSelected }}>
+    <ImageField
+      value={value?.startsWith("http") ? value : undefined}
+      width="200px"
+      height="66px"
+    />
+  </div>
+</background-field>
+
+<script>
+  class BackgroundField extends HTMLElement {
+    constructor() {
+      super();
+
+      const select = this.querySelector("select") as HTMLSelectElement;
+      const customWrapper = this.querySelector(".custom") as HTMLDivElement;
+      const imageField = this.querySelector("image-field") as HTMLElement;
+
+      select.addEventListener("change", () => {
+        if (select.value === "custom") {
+          customWrapper.classList.toggle("hidden", false);
+          this.dataset.value = imageField.dataset.value;
+          return;
+        }
+
+        customWrapper.classList.toggle("hidden", true);
+        this.dataset.value = select.value;
+      });
+
+      imageField.addEventListener("change", () => {
+        this.dataset.value = imageField.dataset.value;
+      });
+    }
+  }
+
+  customElements.define("background-field", BackgroundField);
+</script>
+
+<style lang="scss" is:global>
+  background-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: fit-content;
+
+    .hidden {
+      display: none;
+    }
+
+    label {
+      color: white;
+    }
+
+    input[type="file"] {
+      color: white;
+    }
+  }
+</style>

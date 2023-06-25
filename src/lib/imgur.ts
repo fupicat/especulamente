@@ -19,7 +19,11 @@ export async function uploadImage(file: File): Promise<string> {
     await fetch("https://api.imgur.com/3/upload", request)
   ).json()) as any;
   if (!uploaded.success) {
-    throw new Error("Erro ao upar imagem! Confira se o arquivo está certo.");
+    throw {
+      error: {
+        message: "Erro ao upar imagem! Confira se o arquivo está certo.",
+      },
+    };
   }
   return uploaded.data.link;
 }
@@ -49,7 +53,13 @@ export async function uploadVideo(file: File | null) {
   const uploaded = (await (
     await fetch("https://api.imgur.com/3/upload", request)
   ).json()) as any;
-  if (!uploaded.success) throw uploaded;
+  if (!uploaded.success) {
+    throw {
+      error: {
+        message: "Erro ao upar vídeo! Talvez ele seja muito grande.",
+      },
+    };
+  }
 
   return uploaded.data.link;
 }

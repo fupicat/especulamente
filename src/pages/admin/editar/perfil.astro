@@ -1,11 +1,14 @@
 ---
-import "@/lib/saving-progress/styles.scss";
 import "7.css/dist/7.scoped.css";
+import "@/lib/saving-progress/styles.scss";
 
 import Layout from "@/layouts/Layout.astro";
 import Profile from "@/models/Profile";
 import LoginRequired from "@/layouts/LoginRequired.astro";
 import Box from "@/components/Box.astro";
+import ThemeField from "@/components/formWidgets/ThemeField.astro";
+import BackgroundField from "@/components/formWidgets/BackgroundField.astro";
+import ImageField from "@/components/formWidgets/ImageField.astro";
 
 const sessionProfile = await Profile.current(Astro);
 
@@ -15,51 +18,15 @@ if (!sessionProfile) {
 ---
 
 <LoginRequired profile={sessionProfile}>
-  <Layout
-    title="Configurações do site"
-    profile={sessionProfile}
-    id="config_page"
-  >
+  <Layout title="Editar perfil" profile={sessionProfile} id="edit_profile">
     <div class="container">
-      <Box title="Configurações do site" color="#0c4895">
+      <Box title="Editar perfil" color="#0c4895">
         <form class="win7">
-          <div class="field">
-            <label for="color" class="arial">Cor do cabeçalho</label>
-            <div class="side">
-              <select name="color" id="color">
-                <option
-                  value="default"
-                  selected={!sessionProfile?.preferences?.color}>Padrão</option
-                >
-                <option
-                  value="custom"
-                  selected={sessionProfile?.preferences?.color &&
-                    sessionProfile?.preferences?.color !== "rainbow"}
-                  >Escolher cor...</option
-                >
-                <option
-                  value="rainbow"
-                  selected={sessionProfile?.preferences?.color === "rainbow"}
-                  >🏳️‍🌈? 🤨</option
-                >
-              </select>
-              <input
-                type="color"
-                name="custom-color"
-                id="custom-color"
-                class={sessionProfile?.preferences?.color &&
-                sessionProfile?.preferences?.color !== "rainbow"
-                  ? ""
-                  : "hidden"}
-                value={sessionProfile?.preferences?.color || "#000000"}
-              />
-            </div>
-            <button type="button">Pré-visualizar</button>
-          </div>
-          <div class="field">
-            <label for="password-reset" class="arial">Recuperar senha</label>
-            <button type="button">Enviar e-mail de recuperação de senha</button>
-          </div>
+          <ThemeField label="Cor do cabeçalho" value={sessionProfile?.color} />
+          <BackgroundField
+            label="Imagem de fundo"
+            value={sessionProfile?.background_url}
+          />
         </form>
       </Box>
     </div>
@@ -71,79 +38,32 @@ if (!sessionProfile) {
       showSavingDialog,
     } from "@/lib/saving-progress";
     import { supabase } from "@/lib/supabaseClient";
+    import { updateSitePreview } from "@/lib/sitePreview";
 
-    const avatarPicker = document.querySelector(
-      "#editar_conta #avatar"
-    ) as HTMLInputElement;
-    const avatarImg = document.querySelector(
-      "#editar_conta #avatar_img"
-    ) as HTMLImageElement;
     const form = document.querySelector(
-      "#editar_conta form"
-    ) as HTMLFormElement;
-    const passwordReset = document.querySelector(
-      "#editar_conta #password-reset"
-    ) as HTMLButtonElement;
+      "#edit_profile form"
+    )! as HTMLFormElement;
 
-    avatarPicker.addEventListener("change", (event) => {
-      const target = event.target as HTMLInputElement;
-      const fileUploaded = target.files ? target.files[0] : null;
-      if (fileUploaded) avatarImg.src = URL.createObjectURL(fileUploaded);
-    });
-
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      onSubmit();
-    });
-
-    passwordReset.addEventListener("click", async (event) => {
-      event.preventDefault();
-      const user = await supabase.auth.getUser();
-      if (user.error) {
-        alert("Você não tá logado.");
-        return;
-      }
-
-      const email = user.data.user.email!;
-
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `https://especulamente.netlify.app/admin/recuperar-senha`,
-      });
-      if (error) {
-        alert(error.message);
-        return;
-      }
-      alert("Um e-mail foi enviado para redefinir sua senha!");
-    });
-
-    async function onSubmit() {
-      const data = new FormData(form);
-
-      showSavingDialog();
-
-      const response = await (
-        await fetch("/admin/actions/account", {
-          method: "put",
-          body: data,
-        })
-      ).json();
-
-      if (response.error) {
-        alert(response.error.message);
-        removeSavingDialog();
-        return;
-      }
-
-      const newUsername = (form.querySelector("#username") as HTMLInputElement)
-        .value;
-
-      window.location.href = `/users/${newUsername}`;
+    function updatePreview() {
+      updateSitePreview(themeField.dataset.value, bgField.dataset.value);
     }
+
+    const themeField = form.querySelector("theme-field")!;
+    themeField.addEventListener("change", () => {
+      updatePreview();
+    });
+
+    const bgField = form.querySelector("background-field")!;
+    bgField.addEventListener("change", () => {
+      updatePreview();
+    });
+
+    updatePreview();
   </script>
 </LoginRequired>
 
 <style lang="scss" is:global>
-  #config_page .container {
+  #edit_profile .container {
     padding-top: 26px;
     padding-bottom: 26px;
 
@@ -152,31 +72,6 @@ if (!sessionProfile) {
       display: flex;
       flex-direction: column;
       gap: 16px;
-
-      .field {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-
-        .hidden {
-          display: none;
-        }
-
-        label {
-          color: white;
-        }
-
-        .side {
-          display: flex;
-          gap: 6px;
-        }
-
-        input[type="color"] {
-          height: 22px;
-          width: 22px;
-        }
-      }
     }
   }
 </style>

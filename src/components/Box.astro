@@ -14,7 +14,7 @@ const { title, image, color, compact, additionalClass } = Astro.props;
   class={"page-box" +
     (image ? " with-image" : "") +
     (compact ? " compact" : "") +
-    (` ${additionalClass}` || "")}
+    (additionalClass ? ` ${additionalClass}` : "")}
 >
   <div class="top"></div>
   <div class="bottom">
