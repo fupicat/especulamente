@@ -27,6 +27,7 @@ if (!sessionProfile) {
             label="Imagem de fundo"
             value={sessionProfile?.background_url}
           />
+          <button>submtit</button>
         </form>
       </Box>
     </div>
@@ -39,6 +40,12 @@ if (!sessionProfile) {
     } from "@/lib/saving-progress";
     import { supabase } from "@/lib/supabaseClient";
     import { updateSitePreview } from "@/lib/sitePreview";
+
+    import type { ProfileEditable } from "@/models/Profile";
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     const form = document.querySelector(
       "#edit_profile form"
@@ -59,6 +66,44 @@ if (!sessionProfile) {
     });
 
     updatePreview();
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      showSavingDialog();
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          color: themeField.dataset.value,
+          background_url: bgField.dataset.value?.startsWith("blob:")
+            ? (
+                await (
+                  await fetch("/api/upload-image", {
+                    method: "post",
+                    body: (() => {
+                      let form = new FormData();
+                      form.append(
+                        "file",
+                        bgField.querySelector("input").files![0]
+                      );
+                      return form;
+                    })(),
+                  })
+                ).json()
+              ).image_url
+            : bgField.dataset.value || "",
+        } as ProfileEditable)
+        .eq("id", user.id);
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", user.id)
+        .single();
+
+      window.location.href = `/users/${data.username}`;
+    });
   </script>
 </LoginRequired>
 
